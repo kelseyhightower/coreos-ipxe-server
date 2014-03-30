@@ -72,8 +72,8 @@ COREOS_IPXE_SERVER_LISTEN_HOST
 
 ```
 export COREOS_IPXE_SERVER_BASE_DIR="/opt/coreos-ipxe-server"
-export COREOS_IPXE_SERVER_BASE_URL="10.0.1.10:8080"
-export COREOS_IPXE_SERVER_LISTEN_PORT="8080"
+export COREOS_IPXE_SERVER_BASE_URL="coreos.ipxe.example.com"
+export COREOS_IPXE_SERVER_LISTEN_PORT="80"
 ```
 
 ### Data Directory
