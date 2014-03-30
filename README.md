@@ -125,10 +125,6 @@ data/
     │   └── 268.1.0
     │       ├── coreos_production_pxe.vmlinuz
     │       └── coreos_production_pxe_image.cpio.gz
-    ├── amd64-usr
-    │   └── 268.1.0
-    │       ├── coreos_production_pxe.vmlinuz
-    │       └── coreos_production_pxe_image.cpio.gz
     └── coreos.pub
 ```
 
