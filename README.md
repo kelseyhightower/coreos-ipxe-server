@@ -57,7 +57,7 @@ GET http://coreos.ipxe.example.com?version=268.1.0&state=true
 #### Required:
 
 ```
-COREOS_IPXE_SERVER_BASE_DIR
+COREOS_IPXE_SERVER_DATA_DIR
 COREOS_IPXE_SERVER_BASE_URL
 COREOS_IPXE_SERVER_LISTEN_PORT
 ```
@@ -71,7 +71,7 @@ COREOS_IPXE_SERVER_LISTEN_HOST
 #### Example:
 
 ```
-export COREOS_IPXE_SERVER_BASE_DIR="/opt/coreos-ipxe-server"
+export COREOS_IPXE_SERVER_DATA_DIR="/opt/coreos-ipxe-server"
 export COREOS_IPXE_SERVER_BASE_URL="coreos.ipxe.example.com"
 export COREOS_IPXE_SERVER_LISTEN_PORT="80"
 ```
@@ -81,14 +81,14 @@ export COREOS_IPXE_SERVER_LISTEN_PORT="80"
 Create the data directory which will hold the CoreOS images and the SSH public key:
 
 ```
-mkdir -p $COREOS_IPXE_SERVER_BASE_DIR/coreos/amd64-generic
+mkdir -p $COREOS_IPXE_SERVER_DATA_DIR/coreos/amd64-generic
 ```
 
 #### Download CoreOS images
 
 ```
-mkdir $COREOS_IPXE_SERVER_BASE_DIR/coreos/amd64-generic/268.1.0
-cd $COREOS_IPXE_SERVER_BASE_DIR/coreos/amd64-generic/268.1.0
+mkdir $COREOS_IPXE_SERVER_DATA_DIR/coreos/amd64-generic/268.1.0
+cd $COREOS_IPXE_SERVER_DATA_DIR/coreos/amd64-generic/268.1.0
 wget http://storage.core-os.net/coreos/amd64-generic/268.1.0/coreos_production_pxe.vmlinuz
 wget http://storage.core-os.net/coreos/amd64-generic/268.1.0/coreos_production_pxe_image.cpio.gz
 ```
@@ -98,13 +98,13 @@ wget http://storage.core-os.net/coreos/amd64-generic/268.1.0/coreos_production_p
 By default CoreOS iPXE boot scripts will be generated with the CoreOS version set to `latest`. Add a symlink to ensure this works.
 
 ```
-ln -s $COREOS_IPXE_SERVER_BASE_DIR/coreos/amd64-generic/268.1.0 $COREOS_IPXE_SERVER_BASE_DIR/coreos/amd64-generic/latest
+ln -s $COREOS_IPXE_SERVER_DATA_DIR/coreos/amd64-generic/268.1.0 $COREOS_IPXE_SERVER_DATA_DIR/coreos/amd64-generic/latest
 ```
 
 #### Add a SSH public key
 
 ```
-cp ~/.ssh/id_rsa.pub $COREOS_IPXE_SERVER_BASE_DIR/coreos/coreos.pub
+cp ~/.ssh/id_rsa.pub $COREOS_IPXE_SERVER_DATA_DIR/coreos/coreos.pub
 ```
 
 #### Example
@@ -124,4 +124,4 @@ cp ~/.ssh/id_rsa.pub $COREOS_IPXE_SERVER_BASE_DIR/coreos/coreos.pub
 
 The SSH public key must be in place before starting the CoreOS iPXE server. The SSH public will be used when generating the CoreOS iPXE boot scripts.
 
-> The SSH public must exist under `$COREOS_IPXE_SERVER_BASE_DIR` as `coreos.pub`.
+> The SSH public must exist under `$COREOS_IPXE_SERVER_DATA_DIR` as `coreos.pub`.

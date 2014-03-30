@@ -66,9 +66,9 @@ func main() {
 	
 	// Set the base directory where the coreos directory containing
 	// the ssh public key, kernal and boot images.
-	baseDir := os.Getenv("COREOS_IPXE_SERVER_BASE_DIR")
+	baseDir := os.Getenv("COREOS_IPXE_SERVER_DATA_DIR")
 	if baseDir == "" {
-		log.Fatal("COREOS_IPXE_SERVER_BASE_DIR must be set and non-empty")
+		log.Fatal("COREOS_IPXE_SERVER_DATA_DIR must be set and non-empty")
 	}
 
 	// Set the base URL used by the iPXE boot script.
