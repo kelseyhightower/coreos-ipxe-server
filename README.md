@@ -140,7 +140,7 @@ ln -s $COREOS_IPXE_SERVER_BASE_DIR/coreos/amd64-generic/268.1.0 $COREOS_IPXE_SER
 #### Add a SSH public key
 
 ```
-cp ~/.ssh/id.pub $COREOS_IPXE_SERVER_BASE_DIR/coreos/coreos.pub
+cp ~/.ssh/id_rsa.pub $COREOS_IPXE_SERVER_BASE_DIR/coreos/coreos.pub
 ```
 
 #### Example
@@ -148,11 +148,12 @@ cp ~/.ssh/id.pub $COREOS_IPXE_SERVER_BASE_DIR/coreos/coreos.pub
 ```
 /opt/coreos-ipxe-server
 └── coreos
-    └── amd64-generic
-        ├── 268.1.0
-        │   ├── coreos_production_pxe.vmlinuz
-        │   └── coreos_production_pxe_image.cpio.gz
-        └── latest -> /opt/coreos-ipxe-server/coreos/amd64-generic/268.1.0
+    ├── amd64-generic
+    │   ├── 268.1.0
+    │   │   ├── coreos_production_pxe.vmlinuz
+    │   │   └── coreos_production_pxe_image.cpio.gz
+    │   └── latest -> /opt/coreos-ipxe-server/coreos/amd64-generic/268.1.0
+    └── coreos.pub
 ```
 
 ### SSH Public Key
