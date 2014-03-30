@@ -24,6 +24,16 @@ initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
 
+// SetBaseUrl sets the base url.
+func SetBaseUrl(url string) {
+	baseUrl = url
+}
+
+// SetSSHKey sets the ssh public key.
+func SetSSHKey(key string) {
+	sshKey = key
+}
+
 func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 	v := r.URL.Query()
 	version := v.Get("version")
@@ -63,7 +73,7 @@ func sshKeyFromFile(filename string) (string, error) {
 
 func main() {
 	var err error
-	
+
 	// Set the base directory where the coreos directory containing
 	// the ssh public key, kernal and boot images.
 	baseDir := os.Getenv("COREOS_IPXE_SERVER_DATA_DIR")
