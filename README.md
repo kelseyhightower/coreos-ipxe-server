@@ -1,11 +1,8 @@
 # CoreOS iPXE Server
 
-The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via iPXE](https://coreos.com/docs/running-coreos/bare-metal/booting-with-ipxe/) process as possible, mainly hosting iPXE boot scripts and CoreOS PXE boot images. Currently the following features are supported:
+The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via iPXE](https://coreos.com/docs/running-coreos/bare-metal/booting-with-ipxe/) process as possible, mainly generating iPXE boot scripts and serving CoreOS PXE boot images.
 
- - Creating dynamic iPXE boot scripts for running CoreOS 
- - Serve CoreOS PXE boot images
-
-## Table of Content
+## Table of Contents
 
 - [**API**](#api)
   - [iPXE Boot Script](#ipxe-boot-script)
@@ -23,9 +20,9 @@ The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via i
 
 iPXE boot scripts are dynamically generated with support for setting: 
 
- - CoreOS version to boot
+ - CoreOS version
  - SSH public key
- - The use of a state partition.
+ - The use of a state partition
 
 ```
 GET /
@@ -117,7 +114,7 @@ export COREOS_IPXE_SERVER_LISTEN_PORT="8080"
 
 ### Data Directory
 
-Create the data directory which will hold the CoreOS images and the ssh public key:
+Create the data directory which will hold the CoreOS images and the SSH public key:
 
 ```
 mkdir -p $COREOS_IPXE_SERVER_BASE_DIR/coreos/amd64-generic
@@ -130,6 +127,14 @@ mkdir $COREOS_IPXE_SERVER_BASE_DIR/coreos/amd64-generic/268.1.0
 cd $COREOS_IPXE_SERVER_BASE_DIR/coreos/amd64-generic/268.1.0
 wget http://storage.core-os.net/coreos/amd64-generic/268.1.0/coreos_production_pxe.vmlinuz
 wget http://storage.core-os.net/coreos/amd64-generic/268.1.0/coreos_production_pxe_image.cpio.gz
+```
+
+#### Create a symlink to the default version
+
+By default CoreOS iPXE boot scripts will be generated with the CoreOS version set to `latest`. Add a symlink to ensure this works.
+
+```
+ln -s $COREOS_IPXE_SERVER_BASE_DIR/coreos/amd64-generic/268.1.0 $COREOS_IPXE_SERVER_BASE_DIR/coreos/amd64-generic/latest
 ```
 
 #### Add a SSH public key
