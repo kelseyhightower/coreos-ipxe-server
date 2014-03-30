@@ -107,7 +107,7 @@ COREOS_IPXE_SERVER_LISTEN_HOST
 #### Example:
 
 ```
-export COREOS_IPXE_SERVER_BASE_DIR="/var/lib/cis/"
+export COREOS_IPXE_SERVER_BASE_DIR="/opt/coreos-ipxe-server"
 export COREOS_IPXE_SERVER_BASE_URL="10.0.1.10:8080"
 export COREOS_IPXE_SERVER_LISTEN_PORT="8080"
 ```
@@ -146,14 +146,13 @@ cp ~/.ssh/id.pub $COREOS_IPXE_SERVER_BASE_DIR/coreos/coreos.pub
 #### Example
 
 ```
-$COREOS_IPXE_SERVER_BASE_DIR
+/opt/coreos-ipxe-server
 └── coreos
-    ├── amd64-generic
-    │   ├── 268.1.0
-    │   │   ├── coreos_production_pxe.vmlinuz
-    │   │   └── coreos_production_pxe_image.cpio.gz
-    │   └── latest -> data/coreos/amd64-generic/268.1.0
-    └── coreos.pub
+    └── amd64-generic
+        ├── 268.1.0
+        │   ├── coreos_production_pxe.vmlinuz
+        │   └── coreos_production_pxe_image.cpio.gz
+        └── latest -> /opt/coreos-ipxe-server/coreos/amd64-generic/268.1.0
 ```
 
 ### SSH Public Key
