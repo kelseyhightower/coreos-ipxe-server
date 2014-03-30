@@ -18,56 +18,17 @@ The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via i
 
 ### iPXE Boot Script
 
-iPXE boot scripts are dynamically generated with support for setting: 
+Dynamically generate a CoreOS iPXE boot script.
 
- - CoreOS version
- - SSH public key
- - The use of a state partition
+**Parameters**
 
-```
-GET /
-```
-
-**Response**
+Name | Type | Description 
+-----|------|------------
+state | boolean | If `true`, generate iPXE boot script without `state=tmpfs:` kernel parameter. Default: `false`
+version | string | The CoreOS PXE image version to boot. Default: `latest`
 
 ```
-HTTP/1.1 200 OK
-```
-
-```
-set coreos-version latest
-set base-url http://example.com/coreos/amd64-generic/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: state=tmpfs: sshkey="ssh-rsa AAAAB3Nza..."
-initrd ${base-url}/coreos_production_pxe_image.cpio.gz
-boot
-```
-
-#### Set the CoreOS version
-
-```
-GET http://example.com?version=268.1.0
-```
-
-**Response**
-
-```
-HTTP/1.1 200 OK
-```
-
-```
-set coreos-version 268.1.0
-set base-url http://example.com/coreos/amd64-generic/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: state=tmpfs: sshkey="ssh-rsa AAAAB3Nza..."
-initrd ${base-url}/coreos_production_pxe_image.cpio.gz
-boot
-```
-
-> Notice the change in the `set coreos-version` line.
-
-#### Use a state partition
-
-```
-GET http://example.com?state=1
+GET http://coreos.ipxe.example.com
 ```
 
 **Response**
@@ -78,13 +39,17 @@ HTTP/1.1 200 OK
 
 ```
 set coreos-version latest
-set base-url http://example.com/coreos/amd64-generic/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: sshkey="ssh-rsa AAAAB3Nza..."
+set base-url http://coreos.ipxe.example.com/coreos/amd64-generic/${coreos-version}
+kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: state=tmpfs: sshkey="ssh-rsa AAAAB3Nza..."
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 ```
 
-> Notice `state=tmpfs:` missing from the kernel boot parameters
+#### Set the CoreOS version to 268.1.0 and use a state partition
+
+```
+GET http://coreos.ipxe.example.com?version=268.1.0&state=true
+```
 
 ## Configuration
 
