@@ -1,5 +1,10 @@
 # CoreOS iPXE Server
 
+The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via iPXE](https://coreos.com/docs/running-coreos/bare-metal/booting-with-ipxe/) as possible. Currently the following features are supported:
+
+ - Creating dynamic iPXE boot scripts for running CoreOS 
+ - Serve CoreOS pxe boot images
+
 - [**API**](#api)
   - [iPXE Boot Script](#ipxe-boot-script)
     - [Set the CoreOS version](#set-the-coreos-version)
@@ -94,7 +99,7 @@ COREOS_IPXE_SERVER_LISTEN_PORT
 COREOS_IPXE_SERVER_LISTEN_HOST
 ```
 
-### Example:
+#### Example:
 
 ```
 export COREOS_IPXE_SERVER_BASE_DIR="/var/lib/cis/"
