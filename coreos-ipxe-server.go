@@ -62,25 +62,28 @@ func sshKeyFromFile(filename string) (string, error) {
 func main() {
 	var err error
 	
+	// Set the base directory where the coreos directory containing
+	// the ssh public key, kernal and boot images.
 	baseDir := os.Getenv("COREOS_IPXE_SERVER_BASE_DIR")
 	if baseDir == "" {
 		log.Fatal("COREOS_IPXE_SERVER_BASE_DIR must be set and non-empty")
 	}
 
+	// Set the base URL used by the iPXE boot script.
 	baseUrl = os.Getenv("COREOS_IPXE_SERVER_BASE_URL")
 	if baseUrl == "" {
 		log.Fatal("COREOS_IPXE_SERVER_BASE_URL must be set and non-empty")
 	}
 
+	// Set the host:port to listen for HTTP requests.
 	listenHost := os.Getenv("COREOS_IPXE_SERVER_LISTEN_HOST")
-
 	listenPort := os.Getenv("COREOS_IPXE_SERVER_LISTEN_PORT")
 	if listenPort == "" {
 		log.Fatal("COREOS_IPXE_SERVER_LISTEN_PORT must be set and non-empty")
 	}
-
 	hostPort := net.JoinHostPort(listenHost, listenPort)
 
+	// The ssh public must exist as $baseDir/coreos/coreos.pub
 	sshKeyPath := filepath.Join(baseDir, "coreos/coreos.pub")
 	sshKey, err = sshKeyFromFile(sshKeyPath)
 	if err != nil {
@@ -88,6 +91,9 @@ func main() {
 	}
 
 	http.HandleFunc("/", ipxeBootScriptServer)
-	http.Handle("/coreos", http.FileServer(http.Dir(baseDir)))
+
+	// Serve kernel and pxe boot images
+	staticFilePath := filepath.Join(baseDir, "coreos")
+	http.Handle("/coreos/", http.StripPrefix("/coreos/", http.FileServer(http.Dir(staticFilePath))))
 	log.Fatal(http.ListenAndServe(hostPort, nil))
 }
