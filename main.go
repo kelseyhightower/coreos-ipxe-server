@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net"
@@ -12,8 +13,9 @@ import (
 )
 
 var (
+	dataDir string
 	baseUrl string
-	sshKey  string
+	defaultSSHKeyId = "coreos"
 )
 
 const ipxeBootScript = `#!ipxe
@@ -24,14 +26,14 @@ initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
 
+// SetDataDir sets the data directory.
+func SetDataDir(dir string) {
+	dataDir = dir
+}
+
 // SetBaseUrl sets the base url.
 func SetBaseUrl(url string) {
 	baseUrl = url
-}
-
-// SetSSHKey sets the ssh public key.
-func SetSSHKey(key string) {
-	sshKey = key
 }
 
 func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
@@ -41,23 +43,37 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 		version = "latest"
 	}
 	state := v.Get("state")
-
-	t, err := template.New("ipxebootscript").Parse(ipxeBootScript)
+	if state != "true" {
+		state = ""
+	}
+	sshKeyId := v.Get("sshkey")
+	if sshKeyId == "" {
+		sshKeyId = defaultSSHKeyId
+	}
+	sshKeyPath := filepath.Join(dataDir, fmt.Sprintf("sshkeys/%s.pub", sshKeyId))
+	sshKey, err := sshKeyFromFile(sshKeyPath)
 	if err != nil {
-		http.Error(w, "cannot generate ipxe boot script", 500)
+		log.Printf("Error reading ssh publickey from %s: %s", sshKeyPath, err)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 
+	t, err := template.New("ipxebootscript").Parse(ipxeBootScript)
+	if err != nil {
+		log.Print("Error generating iPXE boot script: " + err.Error())
+		http.Error(w, "Error generating the iPXE boot script", 500)
+		return
+	}
 	data := map[string]string{
 		"BaseUrl": baseUrl,
 		"SSHKey":  sshKey,
 		"State":   state,
 		"Version": version,
 	}
-
 	err = t.Execute(w, data)
 	if err != nil {
-		http.Error(w, "cannot generate ipxe boot script", 500)
+		log.Print("Error generating iPXE boot script: " + err.Error())
+		http.Error(w, "Error generating the iPXE boot script", 500)
 		return
 	}
 	return
@@ -72,12 +88,10 @@ func sshKeyFromFile(filename string) (string, error) {
 }
 
 func main() {
-	var err error
-
-	// Set the base directory where the coreos directory containing
+	// Set the data directory where the coreos directory containing
 	// the ssh public key, kernal and boot images.
-	baseDir := os.Getenv("COREOS_IPXE_SERVER_DATA_DIR")
-	if baseDir == "" {
+	dataDir := os.Getenv("COREOS_IPXE_SERVER_DATA_DIR")
+	if dataDir == "" {
 		log.Fatal("COREOS_IPXE_SERVER_DATA_DIR must be set and non-empty")
 	}
 
@@ -95,17 +109,9 @@ func main() {
 	}
 	hostPort := net.JoinHostPort(listenHost, listenPort)
 
-	// The ssh public must exist as $baseDir/coreos/coreos.pub
-	sshKeyPath := filepath.Join(baseDir, "coreos/coreos.pub")
-	sshKey, err = sshKeyFromFile(sshKeyPath)
-	if err != nil {
-		log.Fatal("error reading ssh public key from " + sshKeyPath)
-	}
-
 	http.HandleFunc("/", ipxeBootScriptServer)
-
 	// Serve kernel and pxe boot images
-	staticFilePath := filepath.Join(baseDir, "coreos")
+	staticFilePath := filepath.Join(dataDir, "coreos")
 	http.Handle("/coreos/", http.StripPrefix("/coreos/", http.FileServer(http.Dir(staticFilePath))))
 	log.Fatal(http.ListenAndServe(hostPort, nil))
 }

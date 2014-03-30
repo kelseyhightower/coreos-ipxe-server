@@ -10,7 +10,7 @@ The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via i
 - [**Configuration**](#configuration)
   - [Environment Variables](#environment-variables)
   - [Data Directory](#data-directory)
-  - [SSH Public Key](#ssh-public-key)
+  - [SSH Public Keys](#ssh-public-keys)
 
 ## API
 
@@ -26,6 +26,7 @@ GET http://coreos.ipxe.example.com
 
 Name | Type | Description 
 -----|------|------------
+sshkey | string | The ssh key id to use. The key must exist as `$COREOS_IPXE_SERVER_DATA_DIR/sshkeys/${sshkey}.pub`. Default: `coreos`
 state | boolean | If `true`, generate iPXE boot script without `state=tmpfs:` kernel parameter. Default: `false`
 version | string | The CoreOS PXE image version to boot. Default: `latest`
 
@@ -104,24 +105,29 @@ ln -s $COREOS_IPXE_SERVER_DATA_DIR/coreos/amd64-generic/268.1.0 $COREOS_IPXE_SER
 #### Add a SSH public key
 
 ```
-cp ~/.ssh/id_rsa.pub $COREOS_IPXE_SERVER_DATA_DIR/coreos/coreos.pub
+cp ~/.ssh/id_rsa.pub $COREOS_IPXE_SERVER_DATA_DIR/sshkeys/coreos.pub
 ```
 
 #### Example
 
 ```
-/opt/coreos-ipxe-server
-└── coreos
-    ├── amd64-generic
-    │   ├── 268.1.0
-    │   │   ├── coreos_production_pxe.vmlinuz
-    │   │   └── coreos_production_pxe_image.cpio.gz
-    │   └── latest -> /opt/coreos-ipxe-server/coreos/amd64-generic/268.1.0
+/opt/coreos-ipxe-server/
+├── coreos
+│   └── amd64-generic
+│       ├── 268.1.0
+│       │   ├── coreos_production_pxe.vmlinuz
+│       │   └── coreos_production_pxe_image.cpio.gz
+│       └── latest -> /opt/coreos-ipxe-server/coreos/amd64-generic/268.1.0
+└── sshkeys
     └── coreos.pub
 ```
 
-### SSH Public Key
+### SSH Public Keys
 
-The SSH public key must be in place before starting the CoreOS iPXE server. The SSH public will be used when generating the CoreOS iPXE boot scripts.
+SSH public keys are required to log into your CoreOS system. SSH keys are configured via the sshkey boot parameter, which is part of the CoreOS iPXE boot script. SSH keys are identified by id and are stored under the `$COREOS_IPXE_SERVER_DATA_DIR/sshkeys` directory. 
 
-> The SSH public must exist under `$COREOS_IPXE_SERVER_DATA_DIR` as `coreos.pub`.
+Example:
+
+```
+$COREOS_IPXE_SERVER_DATA_DIR/sshkeys/${sshkeyid}.pub
+```
