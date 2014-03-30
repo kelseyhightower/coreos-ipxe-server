@@ -89,15 +89,15 @@ var iPxeBootScriptTests = []struct {
 
 func TestIPxeBootScriptServer(t *testing.T) {
 	coreosSSHKey := testSSHKey{
-		id: "coreos",
+		id:  "coreos",
 		key: "ssh-rsa AAAAB3Ncoreos",
 	}
 	customSSHKey := testSSHKey{
-		id: "custom",
+		id:  "custom",
 		key: "ssh-rsa AAAAB3Ncustom",
 	}
 
-	testDataDir, err := createTestData([]testSSHKey{coreosSSHKey,customSSHKey})
+	testDataDir, err := createTestData([]testSSHKey{coreosSSHKey, customSSHKey})
 	if err != nil {
 		t.Error(err)
 	}

@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	dataDir string
-	baseUrl string
+	dataDir         string
+	baseUrl         string
 	defaultSSHKeyId = "coreos"
 )
 
