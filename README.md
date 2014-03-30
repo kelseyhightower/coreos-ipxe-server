@@ -4,7 +4,7 @@
 
 ### Environment Variables
 
-Required:
+#### Required:
 
 ```
 COREOS_IPXE_SERVER_BASE_DIR
@@ -12,13 +12,13 @@ COREOS_IPXE_SERVER_BASE_URL
 COREOS_IPXE_SERVER_LISTEN_PORT
 ```
 
-Optional:
+#### Optional:
 
 ```
 COREOS_IPXE_SERVER_LISTEN_HOST
 ```
 
-Example:
+### Example:
 
 ```
 export COREOS_IPXE_SERVER_BASE_DIR="/var/lib/cis/"
