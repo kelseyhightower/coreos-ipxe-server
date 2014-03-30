@@ -26,7 +26,7 @@ GET http://coreos.ipxe.example.com
 
 Name | Type | Description 
 -----|------|------------
-sshkey | string | The ssh key id to use. The key must exist as `$COREOS_IPXE_SERVER_DATA_DIR/sshkeys/${sshkey}.pub`. Default: `coreos`
+sshkey | string | The ssh key id to use. The key must exist as `$COREOS_IPXE_SERVER_DATA_DIR/sshkeys/$sshkey.pub`. Default: `coreos`
 state | boolean | If `true`, generate iPXE boot script without `state=tmpfs:` kernel parameter. Default: `false`
 version | string | The CoreOS PXE image version to boot. Default: `latest`
 
@@ -129,5 +129,5 @@ SSH public keys are required to log into your CoreOS system. SSH keys are config
 Example:
 
 ```
-$COREOS_IPXE_SERVER_DATA_DIR/sshkeys/${sshkeyid}.pub
+$COREOS_IPXE_SERVER_DATA_DIR/sshkeys/$sshkeyid.pub
 ```
