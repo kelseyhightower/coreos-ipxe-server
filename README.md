@@ -117,9 +117,31 @@ export COREOS_IPXE_SERVER_LISTEN_PORT="8080"
 
 ### Data Directory
 
+Create the data directory which will hold the CoreOS images and the ssh public key:
+
 ```
-tree data/
-data/
+mkdir -p $COREOS_IPXE_SERVER_BASE_DIR/coreos/amd64-generic
+```
+
+#### Download CoreOS images
+
+```
+mkdir $COREOS_IPXE_SERVER_BASE_DIR/coreos/amd64-generic/268.1.0
+cd $COREOS_IPXE_SERVER_BASE_DIR/coreos/amd64-generic/268.1.0
+wget http://storage.core-os.net/coreos/amd64-generic/268.1.0/coreos_production_pxe.vmlinuz
+wget http://storage.core-os.net/coreos/amd64-generic/268.1.0/coreos_production_pxe_image.cpio.gz
+```
+
+#### Add a SSH public key
+
+```
+cp ~/.ssh/id.pub $COREOS_IPXE_SERVER_BASE_DIR/coreos/coreos.pub
+```
+
+#### Example
+
+```
+/var/lib/data/
 └── coreos
     ├── amd64-generic
     │   └── 268.1.0
@@ -129,5 +151,7 @@ data/
 ```
 
 ### SSH Public Key
+
+The SSH public key must be in place before starting the CoreOS iPXE server. The SSH public will be used when generating the CoreOS iPXE boot scripts.
 
 The SSH public must exist under `$COREOS_IPXE_SERVER_BASE_DIR` as `coreos.pub`.
