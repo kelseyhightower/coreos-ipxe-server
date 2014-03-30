@@ -6,8 +6,6 @@ The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via i
 
 - [**API**](#api)
   - [iPXE Boot Script](#ipxe-boot-script)
-    - [Set the CoreOS version](#set-the-coreos-version)
-    - [Use a state partition](#use-a-state-partition)
 <p></p>
 - [**Configuration**](#configuration)
   - [Environment Variables](#environment-variables)
