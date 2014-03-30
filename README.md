@@ -1,9 +1,11 @@
 # CoreOS iPXE Server
 
-The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via iPXE](https://coreos.com/docs/running-coreos/bare-metal/booting-with-ipxe/) as possible. Currently the following features are supported:
+The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via iPXE](https://coreos.com/docs/running-coreos/bare-metal/booting-with-ipxe/) process as possible, mainly hosting iPXE boot scripts and CoreOS PXE boot images. Currently the following features are supported:
 
  - Creating dynamic iPXE boot scripts for running CoreOS 
- - Serve CoreOS pxe boot images
+ - Serve CoreOS PXE boot images
+
+## Table of Content
 
 - [**API**](#api)
   - [iPXE Boot Script](#ipxe-boot-script)
@@ -18,6 +20,12 @@ The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via i
 ## API
 
 ### iPXE Boot Script
+
+iPXE boot scripts are dynamically generated with support for setting: 
+
+ - CoreOS version to boot
+ - SSH public key
+ - The use of a state partition.
 
 ```
 GET /
