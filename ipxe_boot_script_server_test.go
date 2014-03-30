@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var ipxeBootScriptDefaultOutput = `#!ipxe
+var ipxeBootScriptDefaultOut = `#!ipxe
 set coreos-version latest
 set base-url http://example.com/coreos/amd64-generic/${coreos-version}
 kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: state=tmpfs: sshkey="ssh-rsa AAAAB3NzaC1yc2"
@@ -14,8 +14,24 @@ initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
 
-var ipxeBootScriptStateTrueOutput = `#!ipxe
+var ipxeBootScriptStateTrueOut = `#!ipxe
 set coreos-version latest
+set base-url http://example.com/coreos/amd64-generic/${coreos-version}
+kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: sshkey="ssh-rsa AAAAB3NzaC1yc2"
+initrd ${base-url}/coreos_production_pxe_image.cpio.gz
+boot
+`
+
+var ipxeBootScriptVersionSetOut = `#!ipxe
+set coreos-version 268.1.0
+set base-url http://example.com/coreos/amd64-generic/${coreos-version}
+kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: state=tmpfs: sshkey="ssh-rsa AAAAB3NzaC1yc2"
+initrd ${base-url}/coreos_production_pxe_image.cpio.gz
+boot
+`
+
+var ipxeBootScriptVersionSetAndStateTrueOut = `#!ipxe
+set coreos-version 268.1.0
 set base-url http://example.com/coreos/amd64-generic/${coreos-version}
 kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: sshkey="ssh-rsa AAAAB3NzaC1yc2"
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
@@ -27,8 +43,10 @@ var iPxeBootScriptTests = []struct {
 	code int
 	url  string
 }{
-	{ipxeBootScriptDefaultOutput, 200, "http://example.com"},
-	{ipxeBootScriptStateTrueOutput, 200, "http://example.com?state=true"},
+	{ipxeBootScriptDefaultOut, 200, "http://example.com"},
+	{ipxeBootScriptStateTrueOut, 200, "http://example.com?state=true"},
+	{ipxeBootScriptVersionSetOut, 200, "http://example.com?version=268.1.0"},
+	{ipxeBootScriptVersionSetAndStateTrueOut, 200, "http://example.com?state=true&version=268.1.0"},
 }
 
 func TestIPxeBootScriptServer(t *testing.T) {
