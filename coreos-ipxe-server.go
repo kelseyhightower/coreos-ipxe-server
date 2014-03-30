@@ -19,7 +19,7 @@ var (
 const ipxeBootScript = `#!ipxe
 set coreos-version {{.Version}}
 set base-url http://{{.BaseUrl}}/coreos/amd64-generic/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: state=tmpfs: sshkey="{{.SSHKey}}"
+kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: {{if not .State}}state=tmpfs: {{end}}sshkey="{{.SSHKey}}"
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
@@ -30,6 +30,7 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 	if version == "" {
 		version = "latest"
 	}
+	state := v.Get("state")
 
 	t, err := template.New("ipxebootscript").Parse(ipxeBootScript)
 	if err != nil {
@@ -40,6 +41,7 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 	data := map[string]string{
 		"BaseUrl": baseUrl,
 		"SSHKey":  sshKey,
+		"State":   state,
 		"Version": version,
 	}
 
