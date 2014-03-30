@@ -154,4 +154,4 @@ $COREOS_IPXE_SERVER_BASE_DIR
 
 The SSH public key must be in place before starting the CoreOS iPXE server. The SSH public will be used when generating the CoreOS iPXE boot scripts.
 
-The SSH public must exist under `$COREOS_IPXE_SERVER_BASE_DIR` as `coreos.pub`.
+> The SSH public must exist under `$COREOS_IPXE_SERVER_BASE_DIR` as `coreos.pub`.
