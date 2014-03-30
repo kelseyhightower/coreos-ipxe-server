@@ -1,5 +1,15 @@
 # CoreOS iPXE Server
 
+- [**API**](#api)
+  - [iPXE Boot Script](#ipxe-boot-script)
+    - [Set the CoreOS version](#set-the-coreos-version)
+    - [Use a state partition](#use-a-state-partition)
+<p></p>
+- [**Configuration**](#configuration)
+  - [Environment Variables](#environment-variables)
+  - [Data Directory](#data-directory)
+  - [SSH Public Key](#ssh-public-key)
+
 ## API
 
 ### iPXE Boot Script
@@ -41,6 +51,8 @@ kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: state=tmpfs: ssh
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 ```
+
+> Notice the change in the `set coreos-version` line.
 
 #### Use a state partition
 
@@ -90,7 +102,7 @@ export COREOS_IPXE_SERVER_BASE_URL="10.0.1.10:8080"
 export COREOS_IPXE_SERVER_LISTEN_PORT="8080"
 ```
 
-## Data Directory
+### Data Directory
 
 ```
 tree data/
@@ -107,6 +119,6 @@ data/
     └── coreos.pub
 ```
 
-## SSH Public Key
+### SSH Public Key
 
 The SSH public must exist under `$COREOS_IPXE_SERVER_BASE_DIR` as `coreos.pub`.
