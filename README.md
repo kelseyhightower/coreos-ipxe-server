@@ -20,6 +20,10 @@ The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via i
 
 Dynamically generate a CoreOS iPXE boot script.
 
+```
+GET http://coreos.ipxe.example.com
+```
+
 **Parameters**
 
 Name | Type | Description 
@@ -27,9 +31,6 @@ Name | Type | Description
 state | boolean | If `true`, generate iPXE boot script without `state=tmpfs:` kernel parameter. Default: `false`
 version | string | The CoreOS PXE image version to boot. Default: `latest`
 
-```
-GET http://coreos.ipxe.example.com
-```
 
 **Response**
 
