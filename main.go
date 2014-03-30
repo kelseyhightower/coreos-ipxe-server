@@ -94,7 +94,7 @@ func sshKeyFromFile(filename string) (string, error) {
 func main() {
 	// Set the data directory where the coreos directory containing
 	// the ssh public key, kernal and boot images.
-	dataDir := os.Getenv("COREOS_IPXE_SERVER_DATA_DIR")
+	dataDir = os.Getenv("COREOS_IPXE_SERVER_DATA_DIR")
 	if dataDir == "" {
 		log.Fatal("COREOS_IPXE_SERVER_DATA_DIR must be set and non-empty")
 	}
