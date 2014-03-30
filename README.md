@@ -141,7 +141,7 @@ cp ~/.ssh/id.pub $COREOS_IPXE_SERVER_BASE_DIR/coreos/coreos.pub
 #### Example
 
 ```
-/var/lib/data/
+$COREOS_IPXE_SERVER_BASE_DIR
 └── coreos
     ├── amd64-generic
     │   └── 268.1.0
