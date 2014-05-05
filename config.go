@@ -7,10 +7,9 @@ import (
 )
 
 var (
-	dataDir         string
-	baseUrl         string
-	hostPort        string
-	defaultSSHKeyId = "coreos"
+	dataDir  string
+	baseUrl  string
+	hostPort string
 )
 
 // SetDataDir sets the data directory.
@@ -44,7 +43,7 @@ func config() {
 	}
 	listenPort := os.Getenv("COREOS_IPXE_SERVER_LISTEN_PORT")
 	if listenPort == "" {
-		listenPort = "9000"
+		log.Fatal("COREOS_IPXE_SERVER_LISTEN_PORT must be set and non-empty")
 	}
 	hostPort = net.JoinHostPort(listenHost, listenPort)
 }

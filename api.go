@@ -15,7 +15,7 @@ import (
 const ipxeBootScript = `#!ipxe
 set coreos-version {{.Version}}
 set base-url http://{{.BaseUrl}}/coreos/amd64-usr/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz {{.Options}}"
+kernel ${base-url}/coreos_production_pxe.vmlinuz {{.Options}}
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
@@ -29,22 +29,21 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 	// Process the cloudconfig parameter.
 	cloudConfigId := v.Get("cloudconfig")
 	if cloudConfigId != "" {
-		cloudConfigPath := filepath.Join(dataDir, fmt.Sprintf("cloud-configs/%s.yml", cloudConfigId))
+		options.SetCloudConfigUrl(fmt.Sprintf("http://%s/configs/%s.yml", baseUrl, cloudConfigId))
 	}
 
 	// Process the sshkey paramter.
 	sshKeyId := v.Get("sshkey")
-	if sshKeyId == "" {
-		sshKeyId = defaultSSHKeyId
+	if sshKeyId != "" {
+		sshKeyPath := filepath.Join(dataDir, fmt.Sprintf("sshkeys/%s.pub", sshKeyId))
+		sshKey, err := sshKeyFromFile(sshKeyPath)
+		if err != nil {
+			log.Printf("Error reading ssh publickey from %s: %s", sshKeyPath, err)
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		options.SSHKey = sshKey
 	}
-	sshKeyPath := filepath.Join(dataDir, fmt.Sprintf("sshkeys/%s.pub", sshKeyId))
-	sshKey, err := sshKeyFromFile(sshKeyPath)
-	if err != nil {
-		log.Printf("Error reading ssh publickey from %s: %s", sshKeyPath, err)
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	options.SSHKey = sshKey
 
 	// Process the version parameter.
 	version := v.Get("version")

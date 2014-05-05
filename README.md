@@ -29,7 +29,7 @@ GET http://coreos.ipxe.example.com
 Name | Type | Description 
 -----|------|------------
 cloudconfig | string | The cloud config id to use. The key must exist as `$COREOS_IPXE_SERVER_DATA_DIR/configs/$cloudconfig.yml`
-sshkey | string | The ssh key id to use. The key must exist as `$COREOS_IPXE_SERVER_DATA_DIR/sshkeys/$sshkey.pub`. Default: `coreos`
+sshkey | string | The ssh key id to use. The key must exist as `$COREOS_IPXE_SERVER_DATA_DIR/sshkeys/$sshkey.pub`
 version | string | The CoreOS PXE image version to boot. Default: `latest`
 
 
@@ -108,7 +108,7 @@ cp ~/.ssh/id_rsa.pub $COREOS_IPXE_SERVER_DATA_DIR/sshkeys/coreos.pub
 
 #### Add a cloud config file
 
-cp cloud-config.yml $COREOS_IPXE_SERVER_DATA_DIR/cloud-configs/cloud-config.yml
+cp cloud-config.yml $COREOS_IPXE_SERVER_DATA_DIR/configs/cloud-config.yml
 
 #### Example
 
@@ -142,5 +142,5 @@ Cloud configs can be used to automate the configuration of your CoreOS install. 
 Example:
 
 ```
-$COREOS_IPXE_SERVER_DATA_DIR/cloud-configs/cloud-config.yml
+$COREOS_IPXE_SERVER_DATA_DIR/configs/cloud-config.yml
 ```
