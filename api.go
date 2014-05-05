@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"path/filepath"
 	"text/template"
+
+	"github.com/kelseyhightower/coreos-ipxe-server/kernel"
 )
 
 const ipxeBootScript = `#!ipxe
@@ -21,18 +23,16 @@ boot
 func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 	log.Printf("creating boot script for %s", r.RemoteAddr)
 	v := r.URL.Query()
-	cloudConfigUrl := v.Get("cloudconfig")
-	if cloudConfigUrl == "" {
-		cloudConfigUrl = defaultCloudConfigUrl
+
+	options := kernel.New()
+
+	// Process the cloudconfig parameter.
+	cloudConfigId := v.Get("cloudconfig")
+	if cloudConfigId != "" {
+		// cloudConfigPath := filepath.Join(dataDir, fmt.Sprintf("cloud-configs/%s.yml", cloudConfigId))
 	}
-	version := v.Get("version")
-	if version == "" {
-		version = "latest"
-	}
-	state := v.Get("state")
-	if state != "true" {
-		state = ""
-	}
+
+	// Process the sshkey paramter.
 	sshKeyId := v.Get("sshkey")
 	if sshKeyId == "" {
 		sshKeyId = defaultSSHKeyId
@@ -44,6 +44,15 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+	options.SSHKey = sshKey
+
+	// Process the version parameter.
+	version := v.Get("version")
+	if version == "" {
+		version = "latest"
+	}
+
+	// Process the iPXE boot script template.
 	t, err := template.New("ipxebootscript").Parse(ipxeBootScript)
 	if err != nil {
 		log.Print("Error generating iPXE boot script: " + err.Error())
@@ -52,8 +61,7 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 	}
 	data := map[string]string{
 		"BaseUrl": baseUrl,
-		"SSHKey":  sshKey,
-		"State":   state,
+		"Options": options.String(),
 		"Version": version,
 	}
 	err = t.Execute(w, data)

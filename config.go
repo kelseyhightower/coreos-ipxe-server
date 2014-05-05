@@ -9,6 +9,7 @@ import (
 var (
 	dataDir         string
 	baseUrl         string
+	hostPort        string
 	defaultSSHKeyId = "coreos"
 )
 
@@ -45,5 +46,5 @@ func config() {
 	if listenPort == "" {
 		listenPort = "9000"
 	}
-	hostPort := net.JoinHostPort(listenHost, listenPort)
+	hostPort = net.JoinHostPort(listenHost, listenPort)
 }
