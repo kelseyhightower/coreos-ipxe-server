@@ -61,7 +61,7 @@ func (o *Options) String() string {
 		options.WriteString(fmt.Sprintf(" coreos.autologin=%s", o.CoreOSAutoLogin))
 	}
 	if o.SSHKey != "" {
-		options.WriteString(fmt.Sprintf(" sshkey=%s", o.SSHKey))
+		options.WriteString(fmt.Sprintf(" sshkey=\"%s\"", o.SSHKey))
 	}
 	if o.Root != "" {
 		options.WriteString(fmt.Sprintf(" root=%s", o.Root))

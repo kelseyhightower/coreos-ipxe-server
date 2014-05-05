@@ -14,7 +14,7 @@ import (
 
 const ipxeBootScript = `#!ipxe
 set coreos-version {{.Version}}
-set base-url http://{{.BaseUrl}}/coreos/amd64-usr/${coreos-version}
+set base-url http://{{.BaseUrl}}/images/amd64-usr/${coreos-version}
 kernel ${base-url}/coreos_production_pxe.vmlinuz {{.Options}}
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
