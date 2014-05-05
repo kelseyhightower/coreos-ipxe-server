@@ -42,7 +42,7 @@ func createTestData(sshKeys []testSSHKey) (string, error) {
 var ipxeBootScriptDefaultOut = `#!ipxe
 set coreos-version latest
 set base-url http://example.com/coreos/amd64-generic/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: state=tmpfs: sshkey="ssh-rsa AAAAB3Ncoreos"
+kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0 sshkey=ssh-rsa AAAAB3Ncoreos"
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
@@ -50,7 +50,7 @@ boot
 var ipxeBootScriptCustomSSHKeyOut = `#!ipxe
 set coreos-version latest
 set base-url http://example.com/coreos/amd64-generic/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: state=tmpfs: sshkey="ssh-rsa AAAAB3Ncustom"
+kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0 sshkey=ssh-rsa AAAAB3Ncustom"
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
@@ -58,7 +58,7 @@ boot
 var ipxeBootScriptStateTrueOut = `#!ipxe
 set coreos-version latest
 set base-url http://example.com/coreos/amd64-generic/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: sshkey="ssh-rsa AAAAB3Ncoreos"
+kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0 sshkey=ssh-rsa AAAAB3Ncoreos"
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
@@ -66,7 +66,7 @@ boot
 var ipxeBootScriptVersionSetOut = `#!ipxe
 set coreos-version 268.1.0
 set base-url http://example.com/coreos/amd64-generic/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: state=tmpfs: sshkey="ssh-rsa AAAAB3Ncoreos"
+kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0 sshkey=ssh-rsa AAAAB3Ncoreos"
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
@@ -74,7 +74,7 @@ boot
 var ipxeBootScriptVersionSetAndStateTrueOut = `#!ipxe
 set coreos-version 268.1.0
 set base-url http://example.com/coreos/amd64-generic/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz root=squashfs: sshkey="ssh-rsa AAAAB3Ncoreos"
+kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0 sshkey=ssh-rsa AAAAB3Ncoreos"
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `

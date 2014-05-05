@@ -11,11 +11,8 @@ import (
 	"path/filepath"
 )
 
-func init() {
-	config()
-}
-
 func main() {
+	config()
 	staticFilePath := filepath.Join(dataDir, "coreos")
 
 	// Register static file server.

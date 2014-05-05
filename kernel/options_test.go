@@ -5,7 +5,7 @@ import (
 )
 
 func TestDefaultOptions(t *testing.T) {
-	want := " rootfstype=tmpfs console=tty0"
+	want := "rootfstype=tmpfs console=tty0"
 	o := New()
 	options := o.String()
 	if options != want {
@@ -29,7 +29,7 @@ var optionstests = []struct {
 		"",
 		FstypeTmpfs,
 		"ssh-rsa AAAAB3Nza...",
-		" rootfstype=tmpfs console=tty0 console=ttyS0 cloud-config-url=http://host/config.yml coreos.autologin=ttyS0 sshkey=ssh-rsa AAAAB3Nza...",
+		"rootfstype=tmpfs console=tty0 console=ttyS0 cloud-config-url=http://host/config.yml coreos.autologin=ttyS0 sshkey=ssh-rsa AAAAB3Nza...",
 	},
 	{
 		"",
@@ -38,7 +38,7 @@ var optionstests = []struct {
 		"",
 		"",
 		"ssh-rsa AAAAB3Nza...",
-		" rootfstype=tmpfs console=tty0 sshkey=ssh-rsa AAAAB3Nza...",
+		"rootfstype=tmpfs console=tty0 sshkey=ssh-rsa AAAAB3Nza...",
 	},
 }
 

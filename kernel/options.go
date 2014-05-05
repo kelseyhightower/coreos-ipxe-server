@@ -50,7 +50,7 @@ func (o *Options) SetConsole(console []string) {
 
 func (o *Options) String() string {
 	var options bytes.Buffer
-	options.WriteString(fmt.Sprintf(" rootfstype=%s", o.rootFSType))
+	options.WriteString(fmt.Sprintf("rootfstype=%s", o.rootFSType))
 	for _, c := range o.console {
 		options.WriteString(fmt.Sprintf(" console=%s", c))
 	}
