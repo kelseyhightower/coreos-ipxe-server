@@ -29,7 +29,7 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 	// Process the cloudconfig parameter.
 	cloudConfigId := v.Get("cloudconfig")
 	if cloudConfigId != "" {
-		// cloudConfigPath := filepath.Join(dataDir, fmt.Sprintf("cloud-configs/%s.yml", cloudConfigId))
+		cloudConfigPath := filepath.Join(dataDir, fmt.Sprintf("cloud-configs/%s.yml", cloudConfigId))
 	}
 
 	// Process the sshkey paramter.

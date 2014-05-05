@@ -13,12 +13,16 @@ import (
 
 func main() {
 	config()
-	staticFilePath := filepath.Join(dataDir, "coreos")
 
-	// Register static file server.
-	http.Handle("/coreos/", http.StripPrefix("/coreos/",
-		http.FileServer(http.Dir(staticFilePath))))
+	// Register images static file server.
+	http.Handle("/images/", http.StripPrefix("/images/",
+		http.FileServer(http.Dir(filepath.Join(dataDir, "images")))))
 
+	// Register cloud configs static file server.
+	http.Handle("/configs/", http.StripPrefix("/configs/",
+		http.FileServer(http.Dir(filepath.Join(dataDir, "configs")))))
+
+	// Register the iPXE boot script server.
 	http.HandleFunc("/", ipxeBootScriptServer)
 
 	// Start the iPXE Boot Server.
