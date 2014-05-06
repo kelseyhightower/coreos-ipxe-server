@@ -39,7 +39,7 @@ func createTestData(sshKeys []testSSHKey) (string, error) {
 	return d, nil
 }
 
-var ipxeBootScriptDefaultOut = `#!ipxe
+var defaultParameterOut = `#!ipxe
 set coreos-version latest
 set base-url http://example.com/images/amd64-usr/${coreos-version}
 kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0
@@ -47,7 +47,7 @@ initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
 
-var ipxeBootScriptCustomSSHKeyOut = `#!ipxe
+var SSHKeyParameterOut = `#!ipxe
 set coreos-version latest
 set base-url http://example.com/images/amd64-usr/${coreos-version}
 kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0 sshkey="ssh-rsa AAAAB3Ncustom"
@@ -55,16 +55,32 @@ initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
 
-var ipxeBootScriptVersionSetOut = `#!ipxe
-set coreos-version 268.1.0
+var versionParameterOut = `#!ipxe
+set coreos-version 298.0.0
 set base-url http://example.com/images/amd64-usr/${coreos-version}
 kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
 
-var ipxeBootScriptVersionSetAndCustomSSHKeyOut = `#!ipxe
-set coreos-version 268.1.0
+var consoleParameterOut = `#!ipxe
+set coreos-version latest
+set base-url http://example.com/images/amd64-usr/${coreos-version}
+kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0 console=ttyS0
+initrd ${base-url}/coreos_production_pxe_image.cpio.gz
+boot
+`
+
+var cloudConfigParameterOut = `#!ipxe
+set coreos-version latest
+set base-url http://example.com/images/amd64-usr/${coreos-version}
+kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0 cloud-config-url=http://example.com/configs/cloud-config.yml
+initrd ${base-url}/coreos_production_pxe_image.cpio.gz
+boot
+`
+
+var versionSSHKeyParameterOut = `#!ipxe
+set coreos-version 298.0.0
 set base-url http://example.com/images/amd64-usr/${coreos-version}
 kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0 sshkey="ssh-rsa AAAAB3Ncustom"
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
@@ -76,10 +92,12 @@ var iPxeBootScriptTests = []struct {
 	code int
 	url  string
 }{
-	{ipxeBootScriptDefaultOut, 200, "http://example.com"},
-	{ipxeBootScriptCustomSSHKeyOut, 200, "http://example.com?sshkey=custom"},
-	{ipxeBootScriptVersionSetOut, 200, "http://example.com?version=268.1.0"},
-	{ipxeBootScriptVersionSetAndCustomSSHKeyOut, 200, "http://example.com?version=268.1.0&sshkey=custom"},
+	{defaultParameterOut, 200, "http://example.com"},
+	{SSHKeyParameterOut, 200, "http://example.com?sshkey=custom"},
+	{versionParameterOut, 200, "http://example.com?version=298.0.0"},
+	{versionSSHKeyParameterOut, 200, "http://example.com?version=298.0.0&sshkey=custom"},
+	{consoleParameterOut, 200, "http://example.com?console=tty0,ttyS0"},
+	{cloudConfigParameterOut, 200, "http://example.com?cloudconfig=cloud-config"},
 }
 
 func TestIPxeBootScriptServer(t *testing.T) {

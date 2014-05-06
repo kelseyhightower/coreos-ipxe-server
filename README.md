@@ -29,6 +29,7 @@ GET http://coreos.ipxe.example.com
 Name | Type | Description 
 -----|------|------------
 cloudconfig | string | The cloud config id to use. The key must exist as `$COREOS_IPXE_SERVER_DATA_DIR/configs/$cloudconfig.yml`
+console | string | Comma separated list of ttys to enable kernel output and a login prompt on.
 sshkey | string | The ssh key id to use. The key must exist as `$COREOS_IPXE_SERVER_DATA_DIR/sshkeys/$sshkey.pub`
 version | string | The CoreOS PXE image version to boot. Default: `latest`
 
@@ -41,8 +42,48 @@ HTTP/1.1 200 OK
 
 ```
 set coreos-version latest
+set base-url http://coreos.ipxe.example.com/images/amd64-usr/${coreos-version}
+kernel ${base-url}/coreos_production_pxe.vmlinuz console=tty0 rootfstype=tmpfs
+initrd ${base-url}/coreos_production_pxe_image.cpio.gz
+boot
+```
+
+#### Generate Boot Script with a specific cloud config id
+
+```
+GET http://coreos.ipxe.example.com?cloudconfig=cloud-config
+```
+
+**Response**
+
+```
+HTTP/1.1 200 OK
+```
+
+```
+set coreos-version latest
+set base-url http://coreos.ipxe.example.com/images/amd64-usr/${coreos-version}
+kernel ${base-url}/coreos_production_pxe.vmlinuz console=tty0 rootfstype=tmpfs cloud-config-url=http://coreos.ipxe.example.com/configs/cloud-config.yml
+initrd ${base-url}/coreos_production_pxe_image.cpio.gz
+boot
+```
+
+#### Generate Boot Script with a specific sshkey id
+
+```
+GET http://coreos.ipxe.example.com?sshkey=coreos
+```
+
+**Response**
+
+```
+HTTP/1.1 200 OK
+```
+
+```
+set coreos-version latest
 set base-url http://coreos.ipxe.example.com/coreos/amd64-usr/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz sshkey="ssh-rsa AAAAB3Nza..."
+kernel ${base-url}/coreos_production_pxe.vmlinuz console=tty0 rootfstype=tmpfs sshkey="ssh-rsa AAAAB3Nza..."
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 ```

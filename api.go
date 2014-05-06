@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/kelseyhightower/coreos-ipxe-server/kernel"
@@ -25,6 +26,12 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 	v := r.URL.Query()
 
 	options := kernel.New()
+
+	// Process the console parameter.
+	console := v.Get("console")
+	if console != "" {
+		options.SetConsole(strings.Split(console, ","))
+	}
 
 	// Process the cloudconfig parameter.
 	cloudConfigId := v.Get("cloudconfig")
