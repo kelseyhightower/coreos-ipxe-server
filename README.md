@@ -9,6 +9,7 @@ The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via i
 - [Installation](#installation)
 - [Getting Started](docs/getting_started.md)
 - [API](docs/api.md)
+- [Profiles](docs/profiles.md)
 
 ## Installation
 
