@@ -12,8 +12,9 @@ The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via i
 - [**Configuration**](#configuration)
   - [Environment Variables](#environment-variables)
   - [Data Directory](#data-directory)
-  - [SSH Public Keys](#ssh-public-keys)
-  - [iPXE Profiles](docs/profiles.md)
+- [Cloud Configs](docs/cloudconfigs.md)
+- [SSH Keys](docs/sshkeys.md)
+- [iPXE Profiles](docs/profiles.md)
 
 ## API
 
@@ -122,24 +123,4 @@ $COREOS_IPXE_SERVER_DATA_DIR/profiles/development.json
 │   └── development.json
 └── sshkeys
     └── coreos.pub
-```
-
-### SSH Public Keys
-
-SSH keys are configured via the sshkey boot parameter, which is part of the CoreOS iPXE boot script. SSH keys are identified by id and are stored under the `$COREOS_IPXE_SERVER_DATA_DIR/sshkeys` directory. 
-
-Example:
-
-```
-$COREOS_IPXE_SERVER_DATA_DIR/sshkeys/coreos.pub
-```
-
-### Cloud Configs
-
-Cloud configs can be used to automate the configuration of your CoreOS install. The `cloud-config-url` is configured via the cloud-config-url boot parameter, which is part of the CoreOS iPXE boot script. Cloud configs are identified by id and are stored under the `$COREOS_IPXE_SERVER_DATA_DIR/configs` directory.
-
-Example:
-
-```
-$COREOS_IPXE_SERVER_DATA_DIR/configs/development.yml
 ```
