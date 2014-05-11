@@ -26,12 +26,6 @@ All configuration is handled via environment variables with sane defaults. See [
 The data directory is where the CoreOS images, SSH public keys, cloud configs and iPXE profiles are stored. The data directory defaults to `/opt/coreos-ipxe-server`; set it to a different directory via the `COREOS_IPXE_SERVER_DATA_DIR` environment variable:
 
 ```
-export COREOS_IPXE_SERVER_DATA_DIR=/var/lib/coreos-ipxe-server
-```
-
-Next create the subdirectories that will hold the CoreOS iPXE assets: 
-
-```
 mkdir -p $COREOS_IPXE_SERVER_DATA_DIR/{configs,images,profiles,sshkeys}
 ```
 
