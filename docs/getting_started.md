@@ -3,10 +3,12 @@
 - [Installation](#installation)
 - [Configuration](#configuration)
   - [Environment Variables](#environment-variables)
-- [Data Directory](#data-directory) 
-  - [Cloud Config Files](#cloud-config-files)
-  - [SSH Keys](#sshkeys)
-  - [iPXE Profiles](#ipxe-profiles)
+- [Create the Data Directory](#create-the-data-directory) 
+- [Download the CoreOS PXE Images](#download-the-coreos-pxe-images)
+- [Add a Cloud Config File](#add-a-cloud-config-file)
+- [Add a SSH Public Key](#add-an-ssh-public-key)
+- [Add an iPXE Profile](#add-an-ipxe-profile)
+- [Example Data Directory Layout](#example-data-directory-layout)
 
 ## Installation
 
@@ -17,33 +19,26 @@ chmod +x coreos-ipxe-server
 
 ## Configuration
 
-### Environment Variables
+All configuration is handled via environment variables with sane defaults. See [Configuration](configuration.md) for more details.
 
-#### Optional:
 
-```
-COREOS_IPXE_SERVER_DATA_DIR
-COREOS_IPXE_SERVER_BASE_URL
-COREOS_IPXE_SERVER_LISTEN_ADDR
-```
+## Create the Data Directory
 
-#### Example:
+The data directory is where the CoreOS images, SSH public keys, cloud configs and iPXE profiles are stored. The data directory defaults to `/opt/coreos-ipxe-server`; set it to a different directory via the `COREOS_IPXE_SERVER_DATA_DIR` environment variable:
 
 ```
-export COREOS_IPXE_SERVER_DATA_DIR="/opt/coreos-ipxe-server"
-export COREOS_IPXE_SERVER_BASE_URL="coreos.ipxe.example.com:4777"
-export COREOS_IPXE_SERVER_LISTEN_ADDR="0.0.0.0:4777"
+export COREOS_IPXE_SERVER_DATA_DIR=/var/lib/coreos-ipxe-server
 ```
 
-### Data Directory
-
-Create the data directory which will hold the CoreOS images, SSH public keys, and cloud configs:
+Next create the subdirectories that will hold the CoreOS iPXE assets: 
 
 ```
 mkdir -p $COREOS_IPXE_SERVER_DATA_DIR/{configs,images,profiles,sshkeys}
 ```
 
-#### Download CoreOS images
+## Download the CoreOS PXE Images
+
+The CoreOS PXE images are stored under the `$COREOS_IPXE_SERVER_DATA_DIR/images` directory.
 
 ```
 mkdir -p $COREOS_IPXE_SERVER_DATA_DIR/images/amd64-usr/310.1.0
@@ -52,25 +47,60 @@ wget http://storage.core-os.net/coreos/amd64-usr/310.1.0/coreos_production_pxe_i
 wget http://storage.core-os.net/coreos/amd64-usr/310.1.0/coreos_production_pxe.vmlinuz
 ```
 
-#### SSH Keys
+## Add an SSH Public Key
+
+SSH public keys are used to login to your CoreOS instance. SSH public keys are stored under the `$COREOS_IPXE_SERVER_DATA_DIR/sshkeys` directory.
+
+Edit `$COREOS_IPXE_SERVER_DATA_DIR/sshkeys/coreos.pub`
 
 ```
-$COREOS_IPXE_SERVER_DATA_DIR/sshkeys/coreos.pub
+ssh-rsa AAAAB3Nza...
 ```
 
-#### Cloud Config Files
+## Add a Cloud Config File
+
+Cloud config files are used to automated the setup of your CoreOS instance. See [Customize with Cloud Config](https://coreos.com/docs/cluster-management/setup/cloudinit-cloud-config/) for more details. Cloud config files are stored under the `$COREOS_IPXE_SERVER_DATA_DIR/configs` directory.
+
+Edit `$COREOS_IPXE_SERVER_DATA_DIR/configs/development.yml`
 
 ```
-$COREOS_IPXE_SERVER_DATA_DIR/configs/development.yml
+#cloud-config
+
+ssh_authorized _keys:
+    - ssh-rsa AAAAB3Nza...
+coreos:
+  etcd:
+    addr: $private_ipv4:4001
+    peer-addr: $private_ipv4:7001
+  units:
+    - name: etcd.service
+      command: start
+    - name: fleet.service
+      command: start
+    - name: docker.socket
+      command: start
+  oem:
+    id: coreos
+    name: CoreOS Custom
+    version-id: 310.1.0
+    home-url: https://coreos.com
 ```
 
-#### iPXE Profiles
+## Add an iPXE Profile
+
+iPXE profiles are used to define CoreOS boot parameters. iPXE profiles are stored under the `$COREOS_IPXE_SERVER_DATA_DIR/profiles` directory.
+
+Edit `$COREOS_IPXE_SERVER_DATA_DIR/profiles/development.json` 
 
 ```
-$COREOS_IPXE_SERVER_DATA_DIR/profiles/development.json
+{
+	"cloud_config": "development",
+	"rootfstype": "btrfs",
+	"version": "310.1.0"
+}
 ```
 
-#### Example
+## Example Data Directory Layout
 
 ```
 /opt/coreos-ipxe-server/
