@@ -13,6 +13,7 @@ The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via i
   - [Environment Variables](#environment-variables)
   - [Data Directory](#data-directory)
   - [SSH Public Keys](#ssh-public-keys)
+  - [iPXE Profiles](#ipxe-profiles)
 
 ## API
 
@@ -184,4 +185,25 @@ Example:
 
 ```
 $COREOS_IPXE_SERVER_DATA_DIR/configs/cloud-config.yml
+```
+
+### iPXE Profiles
+
+Profiles make creating dynamic iPXE scripts easy.
+
+Example:
+
+```
+$COREOS_IPXE_SERVER_DATA_DIR/profiles/dev.json
+```
+
+```
+{
+  "cloud_config": "development",
+  "console": ["tty0", "tty1"],
+  "coreos_autologin": "tty1",
+  "rootfstype": "btrfs",
+  "sshkey": "coreos",
+  "version": "310.1.0"
+}
 ```
