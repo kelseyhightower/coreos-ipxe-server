@@ -6,12 +6,12 @@ import (
 )
 
 type Options struct {
-    CloudConfig     string   `json:"cloud_config"`
-    Console         []string `json:"console"`
-    CoreOSAutologin string   `json:"coreos_autologin"`
-	Root			string   `json:"root"`
-    RootFstype      string   `json:"rootfstype"`
-    SSHKey          string   `json:"sshkey"`
+	CloudConfig     string   `json:"cloud_config"`
+	Console         []string `json:"console"`
+	CoreOSAutologin string   `json:"coreos_autologin"`
+	Root            string   `json:"root"`
+	RootFstype      string   `json:"rootfstype"`
+	SSHKey          string   `json:"sshkey"`
 	Version         string   `json:"version"`
 	cloudConfigUrl  string
 }

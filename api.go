@@ -41,10 +41,10 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 		err := kernalOptionsFromFile(profilePath, options)
 		if err != nil {
 			log.Printf("Error reading kernal options from %s: %s", profilePath, err)
-            http.Error(w, err.Error(), 500)
-            return
+			http.Error(w, err.Error(), 500)
+			return
 		}
-	}	
+	}
 
 	// Process the root parameter.
 	root := v.Get("root")
