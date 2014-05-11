@@ -5,7 +5,7 @@ import (
 )
 
 func TestDefaultOptions(t *testing.T) {
-	want := "rootfstype=tmpfs console=tty0"
+	want := ""
 	o := New()
 	options := o.String()
 	if options != want {
@@ -16,9 +16,9 @@ func TestDefaultOptions(t *testing.T) {
 var optionstests = []struct {
 	cloudConfigUrl  string
 	console         []string
-	coreOSAutoLogin string
+	coreOSAutologin string
 	root            string
-	rootFSType      string
+	rootFstype      string
 	sshKey          string
 	options         string
 }{
@@ -27,9 +27,9 @@ var optionstests = []struct {
 		[]string{"tty0", "ttyS0"},
 		"ttyS0",
 		"",
-		FstypeTmpfs,
+		"tmpfs",
 		"ssh-rsa AAAAB3Nza...",
-		"rootfstype=tmpfs console=tty0 console=ttyS0 cloud-config-url=http://host/config.yml coreos.autologin=ttyS0 sshkey=\"ssh-rsa AAAAB3Nza...\"",
+		" rootfstype=tmpfs console=tty0 console=ttyS0 cloud-config-url=http://host/config.yml coreos.autologin=ttyS0 sshkey=\"ssh-rsa AAAAB3Nza...\"",
 	},
 	{
 		"",
@@ -38,7 +38,7 @@ var optionstests = []struct {
 		"",
 		"",
 		"ssh-rsa AAAAB3Nza...",
-		"rootfstype=tmpfs console=tty0 sshkey=\"ssh-rsa AAAAB3Nza...\"",
+		" sshkey=\"ssh-rsa AAAAB3Nza...\"",
 	},
 }
 
@@ -47,11 +47,11 @@ func TestOptions(t *testing.T) {
 		o := New()
 		o.SetCloudConfigUrl(tt.cloudConfigUrl)
 		if tt.console != nil {
-			o.SetConsole(tt.console)
+			o.Console = tt.console
 		}
-		o.SetRootFSType(tt.rootFSType)
+		o.RootFstype = tt.rootFstype
 		o.SSHKey = tt.sshKey
-		o.CoreOSAutoLogin = tt.coreOSAutoLogin
+		o.CoreOSAutologin = tt.coreOSAutologin
 		o.Root = tt.root
 		got := o.String()
 		if got != tt.options {

@@ -5,6 +5,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -14,14 +15,10 @@ import (
 	"testing"
 
 	"github.com/kelseyhightower/coreos-ipxe-server/config"
+	"github.com/kelseyhightower/coreos-ipxe-server/kernel"
 )
 
-type testSSHKey struct {
-	id  string
-	key string
-}
-
-func createTestData(sshKeys []testSSHKey) (string, error) {
+func createTestData(profiles map[string]*kernel.Options, sshKeys map[string]string) (string, error) {
 	d, err := ioutil.TempDir("", "coreos-ipxe-server")
 	if err != nil {
 		return "", err
@@ -31,9 +28,26 @@ func createTestData(sshKeys []testSSHKey) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	for _, s := range sshKeys {
-		sshKeyPath := filepath.Join(sshKeyDir, fmt.Sprintf("%s.pub", s.id))
-		err := ioutil.WriteFile(sshKeyPath, []byte(s.key), 0644)
+	for k, v := range sshKeys {
+		sshKeyPath := filepath.Join(sshKeyDir, fmt.Sprintf("%s.pub", k))
+		err := ioutil.WriteFile(sshKeyPath, []byte(v), 0644)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	profileDir := filepath.Join(d, "profiles")
+	err = os.Mkdir(profileDir, 0755)
+	if err != nil {
+		return "", err
+	}
+	for k, v := range profiles {
+		profilePath := filepath.Join(profileDir, fmt.Sprintf("%s.json", k))
+		data, err := json.Marshal(v)
+		if err != nil {
+			return "", err
+		}
+		err = ioutil.WriteFile(profilePath, data, 0644)
 		if err != nil {
 			return "", err
 		}
@@ -41,78 +55,57 @@ func createTestData(sshKeys []testSSHKey) (string, error) {
 	return d, nil
 }
 
-var defaultParameterOut = `#!ipxe
-set coreos-version latest
+var profileAOut = `#!ipxe
+set coreos-version 310.1.0
 set base-url http://example.com/images/amd64-usr/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0
+kernel ${base-url}/coreos_production_pxe.vmlinuz
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
 
-var SSHKeyParameterOut = `#!ipxe
-set coreos-version latest
+var profileBOut = `#!ipxe
+set coreos-version 310.1.0
 set base-url http://example.com/images/amd64-usr/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0 sshkey="ssh-rsa AAAAB3Ncustom"
+kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=btrfs console=tty0 console=ttyS0 cloud-config-url=http://example.com/configs/b.yml coreos.autologin=ttyS0 sshkey="ssh-rsa AAAAB3Ncoreos" root=/dev/sda1
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
-
-var versionParameterOut = `#!ipxe
-set coreos-version 298.0.0
-set base-url http://example.com/images/amd64-usr/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0
-initrd ${base-url}/coreos_production_pxe_image.cpio.gz
-boot
-`
-
-var consoleParameterOut = `#!ipxe
-set coreos-version latest
-set base-url http://example.com/images/amd64-usr/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0 console=ttyS0
-initrd ${base-url}/coreos_production_pxe_image.cpio.gz
-boot
-`
-
-var cloudConfigParameterOut = `#!ipxe
-set coreos-version latest
-set base-url http://example.com/images/amd64-usr/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0 cloud-config-url=http://example.com/configs/cloud-config.yml
-initrd ${base-url}/coreos_production_pxe_image.cpio.gz
-boot
-`
-
-var versionSSHKeyParameterOut = `#!ipxe
-set coreos-version 298.0.0
-set base-url http://example.com/images/amd64-usr/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=tmpfs console=tty0 sshkey="ssh-rsa AAAAB3Ncustom"
-initrd ${base-url}/coreos_production_pxe_image.cpio.gz
-boot
-`
-
 var iPxeBootScriptTests = []struct {
 	body string
 	code int
 	url  string
 }{
-	{defaultParameterOut, 200, "http://example.com"},
-	{SSHKeyParameterOut, 200, "http://example.com?sshkey=custom"},
-	{versionParameterOut, 200, "http://example.com?version=298.0.0"},
-	{versionSSHKeyParameterOut, 200, "http://example.com?version=298.0.0&sshkey=custom"},
-	{consoleParameterOut, 200, "http://example.com?console=tty0,ttyS0"},
-	{cloudConfigParameterOut, 200, "http://example.com?cloudconfig=cloud-config"},
+	{profileAOut, 200, "http://example.com?profile=a"},
+	{profileBOut, 200, "http://example.com?profile=b"},
 }
 
 func TestIPxeBootScriptServer(t *testing.T) {
-	coreosSSHKey := testSSHKey{
-		id:  "coreos",
-		key: "ssh-rsa AAAAB3Ncoreos",
-	}
-	customSSHKey := testSSHKey{
-		id:  "custom",
-		key: "ssh-rsa AAAAB3Ncustom",
+	sshkeys := map[string]string{
+		"coreos": "ssh-rsa AAAAB3Ncoreos",
 	}
 
-	testDataDir, err := createTestData([]testSSHKey{coreosSSHKey, customSSHKey})
+	profiles := map[string]*kernel.Options{
+		"a": &kernel.Options{
+			CloudConfig:     "",
+			Console:         []string{},
+			CoreOSAutologin: "",
+			Root:            "",
+			RootFstype:      "",
+			SSHKey:          "",
+			Version:         "310.1.0",
+		},
+		"b": &kernel.Options{
+			CloudConfig:     "b",
+			Console:         []string{"tty0", "ttyS0"},
+			CoreOSAutologin: "ttyS0",
+			Root:            "/dev/sda1",
+			RootFstype:      "btrfs",
+			SSHKey:          "coreos",
+			Version:         "310.1.0",
+		},
+	}
+
+	testDataDir, err := createTestData(profiles, sshkeys)
 	if err != nil {
 		t.Error(err)
 	}

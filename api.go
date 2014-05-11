@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
-	"strings"
 	"text/template"
 
 	"github.com/kelseyhightower/coreos-ipxe-server/config"
@@ -18,7 +17,7 @@ import (
 const ipxeBootScript = `#!ipxe
 set coreos-version {{.Version}}
 set base-url http://{{.BaseUrl}}/images/amd64-usr/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz {{.Options}}
+kernel ${base-url}/coreos_production_pxe.vmlinuz{{.Options}}
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
@@ -46,37 +45,8 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Process the root parameter.
-	root := v.Get("root")
-	if root != "" {
-		options.Root = root
-	}
-	// Process the fstype parameter.
-	fstype := v.Get("fstype")
-	if fstype != "" {
-		options.RootFstype = fstype
-	}
-
-	// Process the console parameter.
-	console := v.Get("console")
-	if console != "" {
-		options.Console = strings.Split(console, ",")
-	}
-
-	// Process the cloudconfig parameter.
-	cloudConfigId := v.Get("cloudconfig")
-	if cloudConfigId != "" {
-		options.CloudConfig = cloudConfigId
-	}
 	if options.CloudConfig != "" {
-		options.SetCloudConfigUrl(fmt.Sprintf("http://%s/configs/%s.yml",
-			baseUrl, options.CloudConfig))
-	}
-
-	// Process the sshkey paramter.
-	sshKeyId := v.Get("sshkey")
-	if sshKeyId != "" {
-		options.SSHKey = sshKeyId
+		options.SetCloudConfigUrl(fmt.Sprintf("http://%s/configs/%s.yml", baseUrl, options.CloudConfig))
 	}
 	if options.SSHKey != "" {
 		sshKeyPath := filepath.Join(config.DataDir, fmt.Sprintf("sshkeys/%s.pub", options.SSHKey))
@@ -87,12 +57,6 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		options.SSHKey = sshKey
-	}
-
-	// Process the version parameter.
-	version := v.Get("version")
-	if version != "" {
-		options.Version = version
 	}
 
 	// Process the iPXE boot script template.

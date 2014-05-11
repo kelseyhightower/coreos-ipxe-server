@@ -17,10 +17,7 @@ type Options struct {
 }
 
 func New() *Options {
-	return &Options{
-		Console:    []string{"tty0"},
-		RootFstype: "tmpfs",
-	}
+	return &Options{}
 }
 
 func (o *Options) SetCloudConfigUrl(url string) {
@@ -29,7 +26,9 @@ func (o *Options) SetCloudConfigUrl(url string) {
 
 func (o *Options) String() string {
 	var options bytes.Buffer
-	options.WriteString(fmt.Sprintf("rootfstype=%s", o.RootFstype))
+	if o.RootFstype != "" {
+		options.WriteString(fmt.Sprintf(" rootfstype=%s", o.RootFstype))
+	}
 	for _, c := range o.Console {
 		options.WriteString(fmt.Sprintf(" console=%s", c))
 	}
