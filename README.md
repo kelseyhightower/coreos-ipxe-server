@@ -6,44 +6,32 @@ The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via i
 
 ## Table of Contents
 
-- [**API**](#api)
-  - [iPXE Boot Script](#ipxe-boot-script)
-<p></p>
-- [**Getting Started**](docs/getting_started.md)
+- [Installation](#installation)
+- [Getting Started](docs/getting_started.md)
+- [API](docs/api.md)
 
-## API
+## Installation
 
-### iPXE Boot Script
-
-Dynamically generate a CoreOS iPXE boot script.
+### Binary Release
 
 ```
-GET http://coreos.ipxe.example.com
+curl -L https://github.com/kelseyhightower/coreos-ipxe-server/releases/download/v0.3.0/coreos-ipxe-server-0.3.0-darwin-amd64 -o coreos-ipxe-server
+chmod +x coreos-ipxe-server
 ```
 
-**Parameters**
+### Source
 
-Name | Type | Description 
------|------|------------
-profile | string | The CoreOS iPXE profile to use.
-
-
-#### Generate Boot Script with a specific profile
+#### Clone
 
 ```
-GET http://coreos.ipxe.example.com?profile=development
+mkdir -p ${GOPATH}/src/github.com/kelseyhightower
+cd ${GOPATH}/src/github.com/kelseyhightower
+git clone git@github.com:kelseyhightower/coreos-ipxe-server.git
 ```
 
-**Response**
+#### Build
 
 ```
-HTTP/1.1 200 OK
-```
-
-```
-set coreos-version 310.1.0
-set base-url http://coreos.ipxe.example.com/images/amd64-usr/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz console=tty0 rootfstype=btrfs cloud-config-url=http://coreos.ipxe.example.com/configs/development.yml
-initrd ${base-url}/coreos_production_pxe_image.cpio.gz
-boot
+cd ${GOPATH}/src/github.com/kelseyhightower/coreos-ipxe-server
+go build .
 ```
