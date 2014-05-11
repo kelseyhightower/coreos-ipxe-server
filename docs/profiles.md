@@ -17,7 +17,7 @@ A iPXE profile file should contain an associative array which has zero or more o
 
 See [Configuring pxelinux](https://coreos.com/docs/running-coreos/bare-metal/booting-with-pxe/#configuring-pxelinux) for more details.
 
-Example Profile:
+### Example Profile
 
 ```
 $COREOS_IPXE_SERVER_DATA_DIR/profiles/development.json
