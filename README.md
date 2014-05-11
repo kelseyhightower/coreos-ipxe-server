@@ -9,12 +9,7 @@ The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via i
 - [**API**](#api)
   - [iPXE Boot Script](#ipxe-boot-script)
 <p></p>
-- [**Configuration**](#configuration)
-  - [Environment Variables](#environment-variables)
-  - [Data Directory](#data-directory)
-- [Cloud Configs](docs/cloudconfigs.md)
-- [SSH Keys](docs/sshkeys.md)
-- [iPXE Profiles](docs/profiles.md)
+- [**Getting Started**](docs/getting_started.md)
 
 ## API
 
@@ -51,76 +46,4 @@ set base-url http://coreos.ipxe.example.com/images/amd64-usr/${coreos-version}
 kernel ${base-url}/coreos_production_pxe.vmlinuz console=tty0 rootfstype=btrfs cloud-config-url=http://coreos.ipxe.example.com/configs/development.yml
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
-```
-
-## Configuration
-
-### Environment Variables
-
-#### Optional:
-
-```
-COREOS_IPXE_SERVER_DATA_DIR
-COREOS_IPXE_SERVER_BASE_URL
-COREOS_IPXE_SERVER_LISTEN_ADDR
-```
-
-#### Example:
-
-```
-export COREOS_IPXE_SERVER_DATA_DIR="/opt/coreos-ipxe-server"
-export COREOS_IPXE_SERVER_BASE_URL="coreos.ipxe.example.com:4777"
-export COREOS_IPXE_SERVER_LISTEN_ADDR="0.0.0.0:4777"
-```
-
-### Data Directory
-
-Create the data directory which will hold the CoreOS images, SSH public keys, and cloud configs:
-
-```
-mkdir -p $COREOS_IPXE_SERVER_DATA_DIR/{configs,images,profiles,sshkeys}
-```
-
-#### Download CoreOS images
-
-```
-mkdir -p $COREOS_IPXE_SERVER_DATA_DIR/images/amd64-usr/310.1.0
-cd $COREOS_IPXE_SERVER_DATA_DIR/images/amd64-usr/310.1.0
-wget http://storage.core-os.net/coreos/amd64-usr/310.1.0/coreos_production_pxe_image.cpio.gz
-wget http://storage.core-os.net/coreos/amd64-usr/310.1.0/coreos_production_pxe.vmlinuz
-```
-
-#### Add a SSH public key
-
-```
-$COREOS_IPXE_SERVER_DATA_DIR/sshkeys/coreos.pub
-```
-
-#### Add a cloud config file
-
-```
-$COREOS_IPXE_SERVER_DATA_DIR/configs/development.yml
-```
-
-#### Add a iPXE profile
-
-```
-$COREOS_IPXE_SERVER_DATA_DIR/profiles/development.json
-```
-
-#### Example
-
-```
-/opt/coreos-ipxe-server/
-├── configs
-│   └── development.yml
-├── images
-│   └── amd64-usr
-│       └── 310.1.0
-│           ├── coreos_production_pxe.vmlinuz
-│           └── coreos_production_pxe_image.cpio.gz
-├── profiles
-│   └── development.json
-└── sshkeys
-    └── coreos.pub
 ```
