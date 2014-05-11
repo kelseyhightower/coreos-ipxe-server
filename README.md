@@ -13,6 +13,7 @@ The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via i
   - [Environment Variables](#environment-variables)
   - [Data Directory](#data-directory)
   - [SSH Public Keys](#ssh-public-keys)
+  - [iPXE Profiles](#ipxe-profiles)
 
 ## API
 
@@ -28,11 +29,14 @@ GET http://coreos.ipxe.example.com
 
 Name | Type | Description 
 -----|------|------------
-cloudconfig | string | The cloud config id to use. The key must exist as `$COREOS_IPXE_SERVER_DATA_DIR/configs/$cloudconfig.yml`
-console | string | Comma separated list of ttys to enable kernel output and a login prompt on.
-sshkey | string | The ssh key id to use. The key must exist as `$COREOS_IPXE_SERVER_DATA_DIR/sshkeys/$sshkey.pub`
-version | string | The CoreOS PXE image version to boot. Default: `latest`
+profile | string | The CoreOS iPXE profile to use.
 
+
+#### Generate Boot Script with a specific profile
+
+```
+GET http://coreos.ipxe.example.com?profile=development
+```
 
 **Response**
 
@@ -41,49 +45,9 @@ HTTP/1.1 200 OK
 ```
 
 ```
-set coreos-version latest
+set coreos-version 310.1.0
 set base-url http://coreos.ipxe.example.com/images/amd64-usr/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz console=tty0 rootfstype=tmpfs
-initrd ${base-url}/coreos_production_pxe_image.cpio.gz
-boot
-```
-
-#### Generate Boot Script with a specific cloud config id
-
-```
-GET http://coreos.ipxe.example.com?cloudconfig=cloud-config
-```
-
-**Response**
-
-```
-HTTP/1.1 200 OK
-```
-
-```
-set coreos-version latest
-set base-url http://coreos.ipxe.example.com/images/amd64-usr/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz console=tty0 rootfstype=tmpfs cloud-config-url=http://coreos.ipxe.example.com/configs/cloud-config.yml
-initrd ${base-url}/coreos_production_pxe_image.cpio.gz
-boot
-```
-
-#### Generate Boot Script with a specific sshkey id
-
-```
-GET http://coreos.ipxe.example.com?sshkey=coreos
-```
-
-**Response**
-
-```
-HTTP/1.1 200 OK
-```
-
-```
-set coreos-version latest
-set base-url http://coreos.ipxe.example.com/coreos/amd64-usr/${coreos-version}
-kernel ${base-url}/coreos_production_pxe.vmlinuz console=tty0 rootfstype=tmpfs sshkey="ssh-rsa AAAAB3Nza..."
+kernel ${base-url}/coreos_production_pxe.vmlinuz console=tty0 rootfstype=btrfs cloud-config-url=http://coreos.ipxe.example.com/configs/development.yml
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 ```
@@ -92,26 +56,20 @@ boot
 
 ### Environment Variables
 
-#### Required:
+#### Optional:
 
 ```
 COREOS_IPXE_SERVER_DATA_DIR
 COREOS_IPXE_SERVER_BASE_URL
-COREOS_IPXE_SERVER_LISTEN_PORT
-```
-
-#### Optional:
-
-```
-COREOS_IPXE_SERVER_LISTEN_HOST
+COREOS_IPXE_SERVER_LISTEN_ADDR
 ```
 
 #### Example:
 
 ```
 export COREOS_IPXE_SERVER_DATA_DIR="/opt/coreos-ipxe-server"
-export COREOS_IPXE_SERVER_BASE_URL="coreos.ipxe.example.com"
-export COREOS_IPXE_SERVER_LISTEN_PORT="80"
+export COREOS_IPXE_SERVER_BASE_URL="coreos.ipxe.example.com:4777"
+export COREOS_IPXE_SERVER_LISTEN_ADDR="0.0.0.0:4777"
 ```
 
 ### Data Directory
@@ -119,56 +77,56 @@ export COREOS_IPXE_SERVER_LISTEN_PORT="80"
 Create the data directory which will hold the CoreOS images, SSH public keys, and cloud configs:
 
 ```
-mkdir $COREOS_IPXE_SERVER_DATA_DIR/images
-mkdir $COREOS_IPXE_SERVER_DATA_DIR/sshkeys
-mkdir $COREOS_IPXE_SERVER_DATA_DIR/configs
+mkdir -p $COREOS_IPXE_SERVER_DATA_DIR/{configs,images,profiles,sshkeys}
 ```
 
 #### Download CoreOS images
 
 ```
-mkdir $COREOS_IPXE_SERVER_DATA_DIR/images/amd64-usr/298.0.0
-cd $COREOS_IPXE_SERVER_DATA_DIR/images/amd64-usr/298.0.0
-wget http://storage.core-os.net/coreos/amd64-usr/298.0.0/coreos_production_pxe_image.cpio.gz
-wget http://storage.core-os.net/coreos/amd64-usr/298.0.0/coreos_production_pxe.vmlinuz
-```
-
-#### Create a symlink to the default version
-
-By default CoreOS iPXE boot scripts will be generated with the CoreOS version set to `latest`. Add a symlink to ensure this works.
-
-```
-ln -s $COREOS_IPXE_SERVER_DATA_DIR/images/amd64-usr/298.0.0 $COREOS_IPXE_SERVER_DATA_DIR/images/amd64-usr/latest
+mkdir -p $COREOS_IPXE_SERVER_DATA_DIR/images/amd64-usr/310.1.0
+cd $COREOS_IPXE_SERVER_DATA_DIR/images/amd64-usr/310.1.0
+wget http://storage.core-os.net/coreos/amd64-usr/310.1.0/coreos_production_pxe_image.cpio.gz
+wget http://storage.core-os.net/coreos/amd64-usr/310.1.0/coreos_production_pxe.vmlinuz
 ```
 
 #### Add a SSH public key
 
 ```
-cp ~/.ssh/id_rsa.pub $COREOS_IPXE_SERVER_DATA_DIR/sshkeys/coreos.pub
+$COREOS_IPXE_SERVER_DATA_DIR/sshkeys/coreos.pub
 ```
 
 #### Add a cloud config file
 
-cp cloud-config.yml $COREOS_IPXE_SERVER_DATA_DIR/configs/cloud-config.yml
+```
+$COREOS_IPXE_SERVER_DATA_DIR/configs/development.yml
+```
+
+#### Add a iPXE profile
+
+```
+$COREOS_IPXE_SERVER_DATA_DIR/profiles/development.json
+```
 
 #### Example
 
 ```
 /opt/coreos-ipxe-server/
 ├── configs
-│   └── cloud-config.yml
+│   └── development.yml
 ├── images
 │   └── amd64-usr
-│       ├── coreos_production_pxe.vmlinuz
-│       ├── coreos_production_pxe_image.cpio.gz
-│       └── latest -> /opt/coreos-ipxe-server/images/amd64-usr/298.0.0
+│       └── 310.1.0
+│           ├── coreos_production_pxe.vmlinuz
+│           └── coreos_production_pxe_image.cpio.gz
+├── profiles
+│   └── development.json
 └── sshkeys
     └── coreos.pub
 ```
 
 ### SSH Public Keys
 
-SSH public keys are required to log into your CoreOS system. SSH keys are configured via the sshkey boot parameter, which is part of the CoreOS iPXE boot script. SSH keys are identified by id and are stored under the `$COREOS_IPXE_SERVER_DATA_DIR/sshkeys` directory. 
+SSH keys are configured via the sshkey boot parameter, which is part of the CoreOS iPXE boot script. SSH keys are identified by id and are stored under the `$COREOS_IPXE_SERVER_DATA_DIR/sshkeys` directory. 
 
 Example:
 
@@ -178,10 +136,31 @@ $COREOS_IPXE_SERVER_DATA_DIR/sshkeys/coreos.pub
 
 ### Cloud Configs
 
-Cloud configs can be used to automate the configuration of your CoreOS install. The `cloud-config-url` is configured via the cloud-config-url boot parameter, which is part of the CoreOS iPXE boot script. Cloud configs are identified by id and are stored under the `$COREOS_IPXE_SERVER_DATA_DIR/cloud-configs` directory.
+Cloud configs can be used to automate the configuration of your CoreOS install. The `cloud-config-url` is configured via the cloud-config-url boot parameter, which is part of the CoreOS iPXE boot script. Cloud configs are identified by id and are stored under the `$COREOS_IPXE_SERVER_DATA_DIR/configs` directory.
 
 Example:
 
 ```
-$COREOS_IPXE_SERVER_DATA_DIR/configs/cloud-config.yml
+$COREOS_IPXE_SERVER_DATA_DIR/configs/development.yml
+```
+
+### iPXE Profiles
+
+iPXE profiles are used to define CoreOS iPXE boot parameters. Profiles are identified by id and are stored under the `$COREOS_IPXE_SERVER_DATA_DIR/profiles` directory.
+
+Example:
+
+```
+$COREOS_IPXE_SERVER_DATA_DIR/profiles/development.json
+```
+
+```
+{
+  "cloud_config": "development",
+  "console": ["tty0", "tty1"],
+  "coreos_autologin": "tty1",
+  "rootfstype": "btrfs",
+  "sshkey": "coreos",
+  "version": "310.1.0"
+}
 ```

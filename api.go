@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,6 +11,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/kelseyhightower/coreos-ipxe-server/config"
 	"github.com/kelseyhightower/coreos-ipxe-server/kernel"
 )
 
@@ -23,26 +25,61 @@ boot
 
 func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 	log.Printf("creating boot script for %s", r.RemoteAddr)
+
+	baseUrl := config.BaseUrl
+	if baseUrl == "" {
+		baseUrl = r.Host
+	}
 	v := r.URL.Query()
 
 	options := kernel.New()
 
+	// Process the profile parameter.
+	profile := v.Get("profile")
+	if profile != "" {
+		profilePath := filepath.Join(config.DataDir, fmt.Sprintf("profiles/%s.json", profile))
+		err := kernalOptionsFromFile(profilePath, options)
+		if err != nil {
+			log.Printf("Error reading kernal options from %s: %s", profilePath, err)
+			http.Error(w, err.Error(), 500)
+			return
+		}
+	}
+
+	// Process the root parameter.
+	root := v.Get("root")
+	if root != "" {
+		options.Root = root
+	}
+	// Process the fstype parameter.
+	fstype := v.Get("fstype")
+	if fstype != "" {
+		options.RootFstype = fstype
+	}
+
 	// Process the console parameter.
 	console := v.Get("console")
 	if console != "" {
-		options.SetConsole(strings.Split(console, ","))
+		options.Console = strings.Split(console, ",")
 	}
 
 	// Process the cloudconfig parameter.
 	cloudConfigId := v.Get("cloudconfig")
 	if cloudConfigId != "" {
-		options.SetCloudConfigUrl(fmt.Sprintf("http://%s/configs/%s.yml", baseUrl, cloudConfigId))
+		options.CloudConfig = cloudConfigId
+	}
+	if options.CloudConfig != "" {
+		options.SetCloudConfigUrl(fmt.Sprintf("http://%s/configs/%s.yml",
+			baseUrl, options.CloudConfig))
 	}
 
 	// Process the sshkey paramter.
 	sshKeyId := v.Get("sshkey")
 	if sshKeyId != "" {
-		sshKeyPath := filepath.Join(dataDir, fmt.Sprintf("sshkeys/%s.pub", sshKeyId))
+		options.SSHKey = sshKeyId
+	}
+	if options.SSHKey != "" {
+		sshKeyPath := filepath.Join(config.DataDir, fmt.Sprintf("sshkeys/%s.pub", options.SSHKey))
 		sshKey, err := sshKeyFromFile(sshKeyPath)
 		if err != nil {
 			log.Printf("Error reading ssh publickey from %s: %s", sshKeyPath, err)
@@ -54,8 +91,8 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 
 	// Process the version parameter.
 	version := v.Get("version")
-	if version == "" {
-		version = "latest"
+	if version != "" {
+		options.Version = version
 	}
 
 	// Process the iPXE boot script template.
@@ -68,7 +105,7 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 	data := map[string]string{
 		"BaseUrl": baseUrl,
 		"Options": options.String(),
-		"Version": version,
+		"Version": options.Version,
 	}
 	err = t.Execute(w, data)
 	if err != nil {
@@ -85,4 +122,16 @@ func sshKeyFromFile(filename string) (string, error) {
 		return "", err
 	}
 	return string(bytes.TrimSpace(b)), nil
+}
+
+func kernalOptionsFromFile(filename string, options *kernel.Options) error {
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(data, options)
+	if err != nil {
+		return err
+	}
+	return nil
 }

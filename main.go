@@ -9,26 +9,24 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+
+	"github.com/kelseyhightower/coreos-ipxe-server/config"
 )
 
 func main() {
-	config()
-
-	// Register images static file server.
-	http.Handle("/images/", http.StripPrefix("/images/",
-		http.FileServer(http.Dir(filepath.Join(dataDir, "images")))))
-
-	// Register cloud configs static file server.
-	http.Handle("/configs/", http.StripPrefix("/configs/",
-		http.FileServer(http.Dir(filepath.Join(dataDir, "configs")))))
-
+	for _, s := range []string{"/images/", "/configs/", "/profiles/"} {
+		// Register static file servers.
+		http.Handle(s, http.StripPrefix(s,
+			http.FileServer(http.Dir(filepath.Join(config.DataDir, s)))))
+	}
 	// Register the iPXE boot script server.
 	http.HandleFunc("/", ipxeBootScriptServer)
-
 	// Start the iPXE Boot Server.
 	fmt.Println("Starting CoreOS iPXE Server...")
-	fmt.Printf("Listening on %s\n", hostPort)
-	fmt.Printf("Advertised URL %s\n", baseUrl)
-	fmt.Printf("Data directory: %s\n", dataDir)
-	log.Fatal(http.ListenAndServe(hostPort, nil))
+	fmt.Printf("Listening on %s\n", config.ListenAddr)
+	if config.BaseUrl != "" {
+		fmt.Printf("Advertised URL %s\n", config.BaseUrl)
+	}
+	fmt.Printf("Data directory: %s\n", config.DataDir)
+	log.Fatal(http.ListenAndServe(config.ListenAddr, nil))
 }

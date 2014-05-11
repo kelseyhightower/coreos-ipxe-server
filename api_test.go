@@ -12,6 +12,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/kelseyhightower/coreos-ipxe-server/config"
 )
 
 type testSSHKey struct {
@@ -116,8 +118,8 @@ func TestIPxeBootScriptServer(t *testing.T) {
 	}
 	defer os.RemoveAll(testDataDir)
 
-	SetDataDir(testDataDir)
-	SetBaseUrl("example.com")
+	config.DataDir = testDataDir
+	config.BaseUrl = "example.com"
 	for _, v := range iPxeBootScriptTests {
 		req, err := http.NewRequest("GET", v.url, nil)
 		if err != nil {
