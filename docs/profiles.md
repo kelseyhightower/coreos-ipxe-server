@@ -1,6 +1,6 @@
 # Profiles
 
-iPXE profiles are used to define CoreOS iPXE boot parameters. Profiles are identified by id and are stored under the $COREOS_IPXE_SERVER_DATA_DIR/profiles directory.
+iPXE profiles are used to define CoreOS kernel options used during the PXE boot process. Profiles are identified by id and are stored under the `$COREOS_IPXE_SERVER_DATA_DIR/profiles` directory.
 
 ## File Format
 
@@ -15,7 +15,9 @@ A iPXE profile file should contain an associative array which has zero or more o
 * sshkey
 * version
 
-Example:
+See [Configuring pxelinux](https://coreos.com/docs/running-coreos/bare-metal/booting-with-pxe/#configuring-pxelinux) for more details.
+
+Example Profile:
 
 ```
 $COREOS_IPXE_SERVER_DATA_DIR/profiles/development.json
