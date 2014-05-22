@@ -70,13 +70,18 @@ kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=btrfs console=tty0 c
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
+
 var iPxeBootScriptTests = []struct {
-	body string
-	code int
-	url  string
+	name    string
+	body    string
+	code    int
+	baseUrl string
+	url     string
 }{
-	{profileAOut, 200, "http://example.com?profile=a"},
-	{profileBOut, 200, "http://example.com?profile=b"},
+	{"a", profileAOut, 200, "", "http://example.com?profile=a"},
+	{"b", profileBOut, 200, "example.com", "http://example.com?profile=b"},
+	{"c", "", 500, "example.com", "http://example.com?profile=c"},
+	{"d", "", 500, "example.com", "http://example.com?profile=d"},
 }
 
 func TestIPxeBootScriptServer(t *testing.T) {
@@ -103,6 +108,15 @@ func TestIPxeBootScriptServer(t *testing.T) {
 			SSHKey:          "coreos",
 			Version:         "310.1.0",
 		},
+		"c": &kernel.Options{
+			CloudConfig:     "c",
+			Console:         []string{"tty0", "ttyS0"},
+			CoreOSAutologin: "ttyS0",
+			Root:            "/dev/sda1",
+			RootFstype:      "btrfs",
+			SSHKey:          "imabadkey",
+			Version:         "310.1.0",
+		},
 	}
 
 	testDataDir, err := createTestData(profiles, sshkeys)
@@ -112,8 +126,8 @@ func TestIPxeBootScriptServer(t *testing.T) {
 	defer os.RemoveAll(testDataDir)
 
 	config.DataDir = testDataDir
-	config.BaseUrl = "example.com"
 	for _, v := range iPxeBootScriptTests {
+		config.BaseUrl = v.baseUrl
 		req, err := http.NewRequest("GET", v.url, nil)
 		if err != nil {
 			t.Error(err)
@@ -121,8 +135,12 @@ func TestIPxeBootScriptServer(t *testing.T) {
 
 		w := httptest.NewRecorder()
 		ipxeBootScriptServer(w, req)
-		if w.Body.String() != v.body {
-			t.Errorf("expected %s\ngot %s\n", v.body, w.Body.String())
+		if w.Code == 200 && (v.name == "a" || v.name == "b") {
+			if w.Body.String() != v.body {
+				t.Errorf("expected %s\ngot %s\n", v.body, w.Body.String())
+			}
+		} else if (v.name == "c" || v.name == "d") && w.Code != 500 {
+			t.Errorf("expected %d\ngot %d\n", v.code, w.Code)
 		}
 	}
 }
