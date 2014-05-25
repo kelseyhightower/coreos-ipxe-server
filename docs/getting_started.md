@@ -59,7 +59,7 @@ Edit `$COREOS_IPXE_SERVER_DATA_DIR/configs/development.yml`
 ```
 #cloud-config
 
-ssh_authorized _keys:
+ssh_authorized_keys:
     - ssh-rsa AAAAB3Nza...
 coreos:
   etcd:
