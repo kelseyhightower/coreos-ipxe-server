@@ -89,6 +89,7 @@ Edit `$COREOS_IPXE_SERVER_DATA_DIR/profiles/development.json`
 {
 	"cloud_config": "development",
 	"rootfstype": "btrfs",
+	"sshkey": "coreos",
 	"version": "310.1.0"
 }
 ```
