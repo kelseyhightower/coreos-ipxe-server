@@ -80,6 +80,24 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func sshKeyServer(w http.ResponseWriter, r *http.Request) {
+	v := r.URL.Query()
+	keyName := v.Get("name")
+	if keyName != "" {
+		log.Printf("retrieving ssh key %s.pub for %s", keyName, r.RemoteAddr)
+		sshKeyPath := filepath.Join(config.DataDir, fmt.Sprintf("sshkeys/%s.pub", keyName))
+		sshKey, err := sshKeyFromFile(sshKeyPath)
+		if err != nil {
+			log.Printf("Error reading ssh publickey from %s: %s", sshKeyPath, err)
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		data := []byte(fmt.Sprintf("[{\"key\": \"%s\"}]", sshKey))
+		w.Write(data)
+	}
+	return
+}
+
 func sshKeyFromFile(filename string) (string, error) {
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
