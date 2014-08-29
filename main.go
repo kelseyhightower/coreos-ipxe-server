@@ -19,6 +19,8 @@ func main() {
 		http.Handle(s, http.StripPrefix(s,
 			http.FileServer(http.Dir(filepath.Join(config.DataDir, s)))))
 	}
+	// Register the sshkey script server.
+	http.HandleFunc("/keys", sshKeyServer)
 	// Register the iPXE boot script server.
 	http.HandleFunc("/", ipxeBootScriptServer)
 	// Start the iPXE Boot Server.
