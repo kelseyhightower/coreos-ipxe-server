@@ -144,3 +144,47 @@ func TestIPxeBootScriptServer(t *testing.T) {
 		}
 	}
 }
+
+var SSHKeyServerTests = []struct {
+	name    string
+	body    string
+	code    int
+	baseUrl string
+	url     string
+}{
+	{"a", `[{"key": "ssh-rsa AAAAB3Ncoreos"}]`, 200, "", "http://example.com/keys?name=coreos"},
+	{"b", `[{"key": "ssh-rsa AAAAB3Nfoo"}]`, 200, "example.com", "http://example.com/keys?name=foo"},
+	{"c", "", 500, "example.com", "http://example.com/keys?name=badkey"},
+}
+
+func TestSSHKeyServer(t *testing.T) {
+	sshkeys := map[string]string{
+		"coreos": "ssh-rsa AAAAB3Ncoreos",
+		"foo":    "ssh-rsa AAAAB3Nfoo",
+	}
+
+	testDataDir, err := createTestData(nil, sshkeys)
+	if err != nil {
+		t.Error(err)
+	}
+	defer os.RemoveAll(testDataDir)
+
+	config.DataDir = testDataDir
+	for _, v := range SSHKeyServerTests {
+		config.BaseUrl = v.baseUrl
+		req, err := http.NewRequest("GET", v.url, nil)
+		if err != nil {
+			t.Error(err)
+		}
+
+		w := httptest.NewRecorder()
+		sshKeyServer(w, req)
+		if w.Code == 200 && (v.name == "a" || v.name == "b") {
+			if w.Body.String() != v.body {
+				t.Errorf("expected %s\ngot %s\n", v.body, w.Body.String())
+			}
+		} else if (v.name == "c") && w.Code != 500 {
+			t.Errorf("expected %d\ngot %d\n", v.code, w.Code)
+		}
+	}
+}
