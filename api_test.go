@@ -56,16 +56,16 @@ func createTestData(profiles map[string]*kernel.Options, sshKeys map[string]stri
 }
 
 var profileAOut = `#!ipxe
-set coreos-version 310.1.0
-set base-url http://example.com/images/amd64-usr/${coreos-version}
+set coreos-release-channel alpha
+set base-url http://example.com/images/${coreos-release-channel}
 kernel ${base-url}/coreos_production_pxe.vmlinuz
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
 
 var profileBOut = `#!ipxe
-set coreos-version 310.1.0
-set base-url http://example.com/images/amd64-usr/${coreos-version}
+set coreos-release-channel stable
+set base-url http://example.com/images/${coreos-release-channel}
 kernel ${base-url}/coreos_production_pxe.vmlinuz rootfstype=btrfs console=tty0 console=ttyS0 cloud-config-url=http://example.com/configs/b.yml coreos.autologin=ttyS0 sshkey="ssh-rsa AAAAB3Ncoreos" root=/dev/sda1
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
@@ -97,7 +97,7 @@ func TestIPxeBootScriptServer(t *testing.T) {
 			Root:            "",
 			RootFstype:      "",
 			SSHKey:          "",
-			Version:         "310.1.0",
+			ReleaseChannel:  "alpha",
 		},
 		"b": &kernel.Options{
 			CloudConfig:     "b",
@@ -106,7 +106,7 @@ func TestIPxeBootScriptServer(t *testing.T) {
 			Root:            "/dev/sda1",
 			RootFstype:      "btrfs",
 			SSHKey:          "coreos",
-			Version:         "310.1.0",
+			ReleaseChannel:  "stable",
 		},
 		"c": &kernel.Options{
 			CloudConfig:     "c",
@@ -115,7 +115,7 @@ func TestIPxeBootScriptServer(t *testing.T) {
 			Root:            "/dev/sda1",
 			RootFstype:      "btrfs",
 			SSHKey:          "imabadkey",
-			Version:         "310.1.0",
+			ReleaseChannel:  "stable",
 		},
 	}
 

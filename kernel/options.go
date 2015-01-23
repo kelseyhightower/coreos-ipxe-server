@@ -12,7 +12,7 @@ type Options struct {
 	Root            string   `json:"root"`
 	RootFstype      string   `json:"rootfstype"`
 	SSHKey          string   `json:"sshkey"`
-	Version         string   `json:"version"`
+	ReleaseChannel  string   `json:"release_channel"`
 	cloudConfigUrl  string
 }
 

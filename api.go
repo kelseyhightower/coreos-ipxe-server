@@ -7,7 +7,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
+	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/kelseyhightower/coreos-ipxe-server/config"
@@ -15,15 +18,18 @@ import (
 )
 
 const ipxeBootScript = `#!ipxe
-set coreos-version {{.Version}}
-set base-url http://{{.BaseUrl}}/images/amd64-usr/${coreos-version}
+set coreos-release-channel {{.ReleaseChannel}}
+set base-url http://{{.BaseUrl}}/images/${coreos-release-channel}
 kernel ${base-url}/coreos_production_pxe.vmlinuz{{.Options}}
 initrd ${base-url}/coreos_production_pxe_image.cpio.gz
 boot
 `
 
+var replacer = strings.NewReplacer(":", "-", " ", "-")
+
 func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 	log.Printf("creating boot script for %s", r.RemoteAddr)
+	log.Println(url.QueryUnescape(r.URL.String()))
 
 	baseUrl := config.BaseUrl
 	if baseUrl == "" {
@@ -35,13 +41,23 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 
 	// Process the profile parameter.
 	profile := v.Get("profile")
-	if profile != "" {
-		profilePath := filepath.Join(config.DataDir, fmt.Sprintf("profiles/%s.json", profile))
-		err := kernalOptionsFromFile(profilePath, options)
-		if err != nil {
-			log.Printf("Error reading kernal options from %s: %s", profilePath, err)
-			http.Error(w, err.Error(), 500)
-			return
+	mac := replacer.Replace(v.Get("mac"))
+	asset := replacer.Replace(v.Get("asset"))
+	serial := replacer.Replace(v.Get("serial"))
+
+	for _, s := range []string{profile, mac, asset, serial} {
+		if s != "" {
+			profilePath := filepath.Join(config.DataDir, fmt.Sprintf("profiles/%s.json", s))
+			log.Println("loading profile:", profilePath)
+			if _, err := os.Stat(profilePath); os.IsNotExist(err) {
+				continue
+			}
+			err := kernalOptionsFromFile(profilePath, options)
+			if err != nil {
+				log.Printf("Error reading kernal options from %s: %s", profilePath, err)
+				http.Error(w, err.Error(), 500)
+				return
+			}
 		}
 	}
 
@@ -67,9 +83,9 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := map[string]string{
-		"BaseUrl": baseUrl,
-		"Options": options.String(),
-		"Version": options.Version,
+		"BaseUrl":        baseUrl,
+		"Options":        options.String(),
+		"ReleaseChannel": options.ReleaseChannel,
 	}
 	err = t.Execute(w, data)
 	if err != nil {
