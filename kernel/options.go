@@ -9,10 +9,10 @@ type Options struct {
 	CloudConfig     string   `json:"cloud_config"`
 	Console         []string `json:"console"`
 	CoreOSAutologin string   `json:"coreos_autologin"`
+	ReleaseChannel  string   `json:"release_channel"`
 	Root            string   `json:"root"`
 	RootFstype      string   `json:"rootfstype"`
 	SSHKey          string   `json:"sshkey"`
-	ReleaseChannel  string   `json:"release_channel"`
 	cloudConfigUrl  string
 }
 

@@ -45,7 +45,7 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 	asset := replacer.Replace(v.Get("asset"))
 	serial := replacer.Replace(v.Get("serial"))
 
-	for _, s := range []string{profile, mac, asset, serial} {
+	for _, s := range []string{profile, mac, asset, serial, "default"} {
 		if s != "" {
 			profilePath := filepath.Join(config.DataDir, fmt.Sprintf("profiles/%s.json", s))
 			log.Println("loading profile:", profilePath)
@@ -58,6 +58,7 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), 500)
 				return
 			}
+			break
 		}
 	}
 
