@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"text/template"
 
@@ -29,6 +30,9 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 	if baseUrl == "" {
 		baseUrl = r.Host
 	}
+
+	defaultProfile := config.DefaultProfile
+
 	v := r.URL.Query()
 
 	options := kernel.New()
@@ -37,6 +41,12 @@ func ipxeBootScriptServer(w http.ResponseWriter, r *http.Request) {
 	profile := v.Get("profile")
 	if profile != "" {
 		profilePath := filepath.Join(config.DataDir, fmt.Sprintf("profiles/%s.json", profile))
+		if _, err := os.Stat(profilePath); os.IsNotExist(err) {
+			if defaultProfile != "" {
+				log.Printf("Profile %s was not found. Trying default profile %s", profile, defaultProfile)
+				profilePath = filepath.Join(config.DataDir, fmt.Sprintf("profiles/%s.json", defaultProfile))
+			}
+		}
 		err := kernalOptionsFromFile(profilePath, options)
 		if err != nil {
 			log.Printf("Error reading kernal options from %s: %s", profilePath, err)
