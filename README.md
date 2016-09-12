@@ -7,10 +7,10 @@ The CoreOS iPXE Server attempts to automate as much of the [Booting CoreOS via i
 ## Table of Contents
 
 - [Installation](#installation)
-- [Getting Started](docs/getting_started.md)
-- [API](docs/api.md)
-- [Profiles](docs/profiles.md)
-- [Docker setup example](docs/docker.md)
+- [Getting Started] (docs/getting_started.md)
+- [API] (docs/api.md)
+- [Profiles] (docs/profiles.md)
+- [Docker setup example] (docs/docker.md)
 
 ## Installation
 
