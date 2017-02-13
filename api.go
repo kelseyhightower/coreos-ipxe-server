@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/kelseyhightower/coreos-ipxe-server/config"
-	"github.com/kelseyhightower/coreos-ipxe-server/kernel"
+	"github.com/chaosaffe/coreos-ipxe-server/config"
+	"github.com/chaosaffe/coreos-ipxe-server/kernel"
 )
 
 const ipxeBootScript = `#!ipxe
