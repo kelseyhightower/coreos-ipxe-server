@@ -5,9 +5,10 @@ import (
 )
 
 var (
-	BaseUrl    string
-	DataDir    string
-	ListenAddr string
+	BaseUrl        string
+	DataDir        string
+	ListenAddr     string
+	DefaultProfile string
 )
 
 var defaultDataDir = "/opt/coreos-ipxe-server"
@@ -25,4 +26,5 @@ func init() {
 	if ListenAddr == "" {
 		ListenAddr = defaultListenAddr
 	}
+	DefaultProfile = os.Getenv("COREOS_IPXE_SERVER_DEFAULT_PROFILE")
 }
